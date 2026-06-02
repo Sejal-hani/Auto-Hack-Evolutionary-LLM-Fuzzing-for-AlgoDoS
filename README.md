@@ -77,4 +77,5 @@ This tool is designed specifically for identifying structural vulnerabilities in
 
 ---
 **Lead Researchers:** Nimit Arayn & Sejal Patil 
+
 **Academic Year:** 2026
