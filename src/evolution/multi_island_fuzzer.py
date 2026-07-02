@@ -1,16 +1,19 @@
 """
-Multi-Island Evolutionary Orchestrator.
+Multi-Island Evolutionary Orchestrator (Metaprogramming Edition).
 
 Implements the mathematical speciation and soft-migration policies from the FunFuzz framework.
 Orchestrates parallel asynchronous islands to prevent genetic trajectory collapse.
-Evaluates algorithmic degradation via fitness-proportionate selection.
+Features a Distributed Multi-Key API architecture and Native Metaprogramming Execution
+to bypass LLM token limits and instantly generate massive algorithmic payloads.
 """
 
 import math
+import sys
 import uuid
 import asyncio
 import logging
-from typing import List, Dict, Any, Tuple
+import subprocess
+from typing import List, Dict, Any
 
 # Local imports
 from src.sandbox.sandbox_models import TestCase, ExecutionResult, ExecutionStatus
@@ -24,10 +27,12 @@ logger = logging.getLogger(__name__)
 class EvolutionaryIsland:
     """
     An isolated genetic population representing a single LLM attack strategy.
+    Now equipped with its own dedicated LLM Agent (and API Key) for distributed parallel API calls.
     """
-    def __init__(self, island_id: str, strategy_prompt: str, population_size: int = 5):
+    def __init__(self, island_id: str, strategy_prompt: str, llm_agent: LlamaFuzzerAgent, population_size: int = 5):
         self.island_id = island_id
         self.strategy_prompt = strategy_prompt
+        self.llm_agent = llm_agent
         self.population_size = population_size
         
         # The genetic pool: stores the evaluated ExecutionResults of this island
@@ -50,8 +55,10 @@ class EvolutionaryIsland:
         """Extracts the best payloads to feed back into the LLM's context window."""
         elites = []
         for res in self.population[:top_k]:
+            # We truncate the payload in the context window so the LLM doesn't waste tokens reading 5000 numbers
+            payload_str = res.stdout.decode('utf-8', errors='replace') if res.stdout else res.test_case_id
             elites.append({
-                "payload": res.stdout.decode('utf-8', errors='replace') if res.stdout else res.test_case_id, # Fallback ID
+                "payload_preview": payload_str[:100] + "... [TRUNCATED]", 
                 "cpu_time_ms": res.telemetry.cpu_user_time_ms
             })
         return elites
@@ -65,18 +72,30 @@ class EvolutionaryIsland:
 
 class FuzzOrchestrator:
     """
-    The Global Fuzzer. Runs the islands in parallel, evaluates fitness, and executes migrations.
+    The Global Fuzzer. Runs the islands in parallel, executes the LLM's Python scripts natively,
+    evaluates fitness in the Sandbox, and executes Cross-Island migrations.
     """
-    def __init__(self, sandbox: SecureSandbox, llm_agent: LlamaFuzzerAgent, n_constraint: int):
+    def __init__(self, sandbox: SecureSandbox, island_keys: List[str], n_constraint: int):
         self.sandbox = sandbox
-        self.llm_agent = llm_agent
         self.n_constraint = n_constraint
         
-        # Initialize 3 distinct genetic islands
+        # Initialize 3 distinct genetic islands, injecting a UNIQUE API KEY into each one
         self.islands = [
-            EvolutionaryIsland("Island_Alpha", "EXTREMIST: Use array boundary bounds, MAX_INT, MIN_INT, or 0."),
-            EvolutionaryIsland("Island_Beta", "DUPLICATOR: Use dense repetition. Maximize identical array elements to force hash collisions."),
-            EvolutionaryIsland("Island_Gamma", "REVERSER: Generate strictly descending or monotonically structured sequences.")
+            EvolutionaryIsland(
+                "Island_Alpha", 
+                "EXTREMIST: Use array boundary bounds, MAX_INT, MIN_INT, or 0.", 
+                LlamaFuzzerAgent(island_keys[0])
+            ),
+            EvolutionaryIsland(
+                "Island_Beta", 
+                "DUPLICATOR: Use dense repetition. Maximize identical array elements to force hash collisions.", 
+                LlamaFuzzerAgent(island_keys[1])
+            ),
+            EvolutionaryIsland(
+                "Island_Gamma", 
+                "REVERSER: Generate strictly descending or monotonically structured sequences.", 
+                LlamaFuzzerAgent(island_keys[2])
+            )
         ]
         
     async def process_island_generation(
@@ -87,13 +106,13 @@ class FuzzOrchestrator:
         comp_result: CompilationResult,
         generation: int
     ) -> bool:
-        """Runs a single generation for a single island asynchronously."""
+        """Runs a single generation for a single island asynchronously (Metaprogramming Execution)."""
         # 1. Get Elite Context from the Island's history
         elite_context = island.get_elite_pool(top_k=3)
         
-        # 2. Ask LLM to mutate (Awaits network I/O without blocking other islands)
-        logger.info(f"[{island.island_id}] Gen {generation}: Querying LLM...")
-        mutated_payloads = await self.llm_agent.generate_mutations(
+        # 2. Ask the Island's dedicated LLM to write a Python Generator Script
+        logger.info(f"[{island.island_id}] Gen {generation}: Requesting Python Metaprogram from LLM...")
+        generated_codes = await island.llm_agent.generate_mutations(
             session=session,
             ast_meta=ast_meta,
             elite_telemetry=elite_context,
@@ -101,31 +120,53 @@ class FuzzOrchestrator:
             island_strategy=island.strategy_prompt
         )
         
-        if not mutated_payloads:
+        if not generated_codes:
             return False
 
-        # 3. Compile payloads to TestCase objects & Execute in Sandbox
-        generation_results = []
-        for payload_str in mutated_payloads:
-            tc = TestCase(
-                id=uuid.uuid4().hex[:8],
-                payload=payload_str.encode('utf-8'),
-                generation=generation,
-                n_constraint=self.n_constraint
+        python_script = generated_codes[0]
+        
+        # 3. Native Execution: Run the LLM's Python code to instantly generate the massive payload
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-c", python_script],
+                capture_output=True,
+                text=True,
+                timeout=2.0  # The Python math script should run in <0.1s. If it loops infinitely, kill it.
             )
+            payload_str = proc.stdout.strip()
             
-            # Synchronous CPU Execution (Fast, isolated via OS limits)
-            exec_result = self.sandbox.evaluate(comp_result, tc)
-            generation_results.append(exec_result)
-            
-            # FAST FAIL / WIN CONDITION: Did we TLE the program?
-            if exec_result.is_algodos_triggered:
-                logger.critical(f"🚨 ALGODOS ACHIEVED ON {island.island_id}! 🚨 Payload ID: {tc.id}")
-                return True
+            if proc.returncode != 0:
+                logger.error(f"[{island.island_id}] LLM's Python script crashed! Error: {proc.stderr[:150]}")
+                return False
+                
+            if not payload_str:
+                logger.error(f"[{island.island_id}] LLM's Python script ran successfully but printed nothing.")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            logger.error(f"[{island.island_id}] LLM's Python script exceeded 2.0s execution time limit.")
+            return False
 
-        # 4. Update Island Genetic Pool
-        island.update_population(generation_results)
+        # 4. Compile the generated payload & Execute in C++ Sandbox
+        tc = TestCase(
+            id=uuid.uuid4().hex[:8],
+            payload=payload_str.encode('utf-8'),
+            generation=generation,
+            n_constraint=self.n_constraint
+        )
+        
+        # Synchronous CPU Execution (Isolated via OS Limits)
+        exec_result = self.sandbox.evaluate(comp_result, tc)
+        
+        # FAST FAIL / WIN CONDITION: Did we TLE the C++ program?
+        if exec_result.is_algodos_triggered:
+            logger.critical(f"🚨 ALGODOS ACHIEVED ON {island.island_id}! 🚨 Payload ID: {tc.id}")
+            return True
+
+        # 5. Update Island Genetic Pool
+        island.update_population([exec_result])
         logger.info(f"[{island.island_id}] Gen {generation} Complete. Peak CPU Time: {island.highest_fitness}ms")
+        
         return False
 
     def perform_soft_migration(self):
@@ -150,7 +191,7 @@ class FuzzOrchestrator:
             weak.prune_weak(bottom_percent=0.30)
             
             # Inject strong migrants into the weak island
-            # We copy them by reference because they are @dataclass(frozen=True)
+            # Copied by reference because they are @dataclass(frozen=True)
             weak.population.extend(migrants)
             
             # Re-sort the weak island

@@ -1,9 +1,11 @@
 """
-Asynchronous LLM Fuzzing Agent.
+Asynchronous LLM Fuzzing Agent (Metaprogramming Edition).
 
-Interfaces with the free Groq API (Llama-3 70B).
+Interfaces with the free Groq API using a Multi-Key Distributed Architecture.
 Engineered for high-concurrency multi-island evolutionary loops.
-Features strict JSON schema enforcement, Markdown stripping, and HTTP 429 Exponential Backoff.
+Bypasses LLM output token limits by utilizing Metaprogramming:
+Instead of generating massive payload arrays, it generates native Python 3 scripts
+that programmatically print the payload, reducing token usage by 99%.
 """
 
 import re
@@ -22,15 +24,15 @@ logger = logging.getLogger(__name__)
 class LlamaFuzzerAgent:
     """
     Non-blocking LLM orchestrator. 
-    Translates hardware telemetry and AST metadata into adversarial prompts.
+    Translates hardware telemetry and AST metadata into Python-based payload generators.
     """
 
-    def __init__(self, api_key: str = None, model: str = "llama3-70b-8192"):
-        # Expects the GROQ_API_KEY environment variable if not passed directly
-        self.api_key = api_key or os.environ.get("GROQ_API_KEY")
-        if not self.api_key:
-            raise ValueError("CRITICAL: GROQ_API_KEY environment variable is missing. Obtain it free from console.groq.com")
+    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
+        # Explicit API key injection enables Multi-Island isolated rate-limit pools
+        if not api_key:
+            raise ValueError("CRITICAL: API key is missing for this LLM Agent instance.")
             
+        self.api_key = api_key
         self.model = model
         self.api_url = "https://api.groq.com/openai/v1/chat/completions"
         self.headers = {
@@ -40,35 +42,32 @@ class LlamaFuzzerAgent:
 
     def _build_system_prompt(self, ast_meta: CppAstMetadata, n_constraint: int, island_strategy: str) -> str:
         """
-        The Master Prompt. Injects static analysis directly into the LLM's brain.
-        Island Strategies: 'REVERSER', 'EXTREMIST', 'DUPLICATOR'
+        The Metaprogramming Master Prompt. 
+        Forces the LLM to write Python execution code rather than raw data.
         """
         return f"""You are an elite automated vulnerability fuzzer targeting Algorithmic Denial of Service (AlgoDoS).
-Your goal is to generate test cases that maximize CPU Execution Time (Time Limit Exceeded).
+Your goal is to maximize CPU Execution Time in a target C++ program.
 
-CONSTRAINT LOCK: You MUST generate exactly an array of size N = {n_constraint}.
+CONSTRAINT LOCK: The payload MUST contain exactly N = {n_constraint} elements.
 ISLAND MUTATION STRATEGY: {island_strategy}
-(Apply this strategy: e.g., if EXTREMIST, use INT_MAX/INT_MIN. If DUPLICATOR, maximize hash collisions).
 
 {ast_meta.to_llm_prompt_context()}
 
+CRITICAL INSTRUCTION - DO NOT OUTPUT THE RAW ARRAY:
+Because outputting {n_constraint} numbers directly will exceed your token limits, YOU MUST WRITE A PYTHON 3 SCRIPT that programmatically generates the array and prints it space-separated to standard output.
+
 OUTPUT FORMAT:
-You must return strictly valid JSON. No markdown formatting, no explanations, no yapping.
+You must return strictly valid JSON. No markdown formatting outside the JSON, no explanations.
 Format:
 {{
-    "mutations": [
-        "10 20 30 ...", 
-        "99 99 99 ..."
-    ]
+    "generator_code": "import random\\nprint(' '.join(str(i * 107897) for i in range({n_constraint})))"
 }}
-Each string in the "mutations" array is one complete test case payload."""
+The Python code MUST print exactly {n_constraint} integers, space-separated. No extra text, no prompts."""
 
     def _clean_json_response(self, raw_text: str) -> Dict[str, Any]:
         """
-        LLMs are notorious for wrapping JSON in Markdown (```json ... ```) 
-        even when told not to. This regex rips the pure JSON out of the response.
+        Strips markdown wrappers (```json ... ```) and extracts pure JSON.
         """
-        # Strip markdown code blocks
         json_pattern = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL)
         match = json_pattern.search(raw_text)
         clean_text = match.group(1) if match else raw_text
@@ -88,17 +87,19 @@ Each string in the "mutations" array is one complete test case payload."""
         island_strategy: str = "DEFAULT"
     ) -> List[str]:
         """
-        Async API call with Exponential Backoff for Free-Tier Rate Limits.
-        elite_telemetry contains the top 3 test cases from the previous generation and their CPU times.
+        Async API call with Exponential Backoff. 
+        Returns a list containing the generated Python script.
         """
         system_prompt = self._build_system_prompt(ast_meta, n_constraint, island_strategy)
         
         # Build the Evolutionary Context
         user_content = "PREVIOUS GENERATION ELITE TEST CASES (Learn from these):\n"
         for idx, elite in enumerate(elite_telemetry):
-            user_content += f"Test Case {idx+1} | CPU Time: {elite['cpu_time_ms']}ms | Payload Preview: {elite['payload'][:100]}...\n"
+            # We use 'payload_preview' because the orchestrator now truncates the massive arrays
+            preview = elite.get('payload_preview', elite.get('payload', ''))
+            user_content += f"Test Case {idx+1} | CPU Time: {elite['cpu_time_ms']}ms | Preview: {preview}\n"
             
-        user_content += "\nAnalyze the telemetry. Mutate these arrays to cause even higher CPU time. Output 5 new mutations in JSON."
+        user_content += "\nWrite a Python 3 script to generate an even more destructive array based on the strategy. Output JSON with the 'generator_code' key."
 
         payload = {
             "model": self.model,
@@ -106,11 +107,12 @@ Each string in the "mutations" array is one complete test case payload."""
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content}
             ],
-            "temperature": 0.8, # High temperature for creative adversarial attacks
+            "temperature": 0.8,
+            "max_tokens": 1000, # Dropped from 8000 to 1000 since it's just generating ~5 lines of Python!
             "response_format": {"type": "json_object"}
         }
 
-        # Exponential Backoff Loop
+        # Exponential Backoff Loop for Free-Tier Limits
         max_retries = 5
         base_delay = 2.0
 
@@ -121,12 +123,15 @@ Each string in the "mutations" array is one complete test case payload."""
                         data = await response.json()
                         raw_content = data['choices'][0]['message']['content']
                         parsed_json = self._clean_json_response(raw_content)
-                        return parsed_json.get("mutations", [])
+                        
+                        # Extract the Python script
+                        code = parsed_json.get("generator_code", "")
+                        return [code] if code else []
                         
                     elif response.status == 429:
-                        # Rate Limit Hit. We must wait.
+                        # Rate Limit Hit. Exponentially scale the wait time.
                         wait_time = base_delay * (2 ** attempt)
-                        logger.warning(f"Groq API Rate Limit Hit (429). Retrying in {wait_time}s...")
+                        logger.warning(f"API Rate Limit Hit (429). Retrying in {wait_time}s...")
                         await asyncio.sleep(wait_time)
                         continue
                     else:
@@ -138,5 +143,5 @@ Each string in the "mutations" array is one complete test case payload."""
                 logger.error(f"Network error communicating with LLM: {e}")
                 await asyncio.sleep(base_delay)
                 
-        logger.error("Max retries exceeded. LLM Agent failed to generate mutations.")
+        logger.error("Max retries exceeded. LLM Agent failed to generate metaprogramming script.")
         return []

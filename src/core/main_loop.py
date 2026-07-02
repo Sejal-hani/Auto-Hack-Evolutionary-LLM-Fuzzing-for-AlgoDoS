@@ -3,9 +3,11 @@ CF-Fuzz Command Center.
 
 Orchestrates the complete lifecycle of the AlgoDoS discovery pipeline.
 Wires together AST Static Analysis, OS Sandboxing, and Multi-Island LLM Evolution.
-Implements highly concurrent execution loops and real-time CSV telemetry persistence.
+Implements highly concurrent execution loops, multi-key API routing, 
+and real-time CSV telemetry persistence.
 """
 
+import os
 import csv
 import sys
 import time
@@ -16,12 +18,11 @@ from pathlib import Path
 # High-performance async HTTP client
 import aiohttp
 
-# Local imports (The arsenal we built)
+# Local imports (The arsenal)
 from src.sandbox.compiler import CppCompiler
 from src.sandbox.sandbox_models import OptimizationLevel
 from src.sandbox.telemetry_runner import SecureSandbox
 from src.ast_analyzer.cfg_parser import AstAnalyzer
-from src.llm_engine.async_llm_agent import LlamaFuzzerAgent
 from src.evolution.multi_island_fuzzer import FuzzOrchestrator
 
 # Setup production-grade terminal logging
@@ -35,7 +36,7 @@ logger = logging.getLogger("CF-Fuzz")
 class FuzzSession:
     """Manages the end-to-end execution of a fuzzing campaign against a specific victim."""
     
-    def __init__(self, victim_cpp_path: str, n_constraint: int = 1000):
+    def __init__(self, victim_cpp_path: str, n_constraint: int = 5000):
         self.victim_file = Path(victim_cpp_path)
         self.n_constraint = n_constraint
         self.max_generations = 30
@@ -52,7 +53,7 @@ class FuzzSession:
         
         # 1. Read Victim Source
         if not self.victim_file.exists():
-            logger.error("Victim C++ file not found.")
+            logger.error(f"Victim C++ file not found: {self.victim_file}")
             sys.exit(1)
         source_code = self.victim_file.read_text(encoding='utf-8')
         
@@ -74,10 +75,22 @@ class FuzzSession:
             
         logger.info(f"Binary Forge Success. SHA-256: {comp_result.source_hash[:12]}")
         
-        # 4. Initialize Engines
+        # 4. Initialize Multi-Key Engines
         sandbox = SecureSandbox(time_limit_ms=2000, memory_limit_mb=256)
-        llm_agent = LlamaFuzzerAgent() # Assumes GROQ_API_KEY in env
-        orchestrator = FuzzOrchestrator(sandbox, llm_agent, self.n_constraint)
+        
+        # Smart API Key Routing (Allows fallback to a single master key if 3 aren't available yet)
+        master_key = os.environ.get("GROQ_API_KEY")
+        island_keys = [
+            os.environ.get("GROQ_API_KEY_ALPHA", master_key),
+            os.environ.get("GROQ_API_KEY_BETA", master_key),
+            os.environ.get("GROQ_API_KEY_GAMMA", master_key)
+        ]
+        
+        if not all(island_keys):
+            logger.error("CRITICAL: API keys missing! Set GROQ_API_KEY, or set ALPHA/BETA/GAMMA keys individually.")
+            sys.exit(1)
+            
+        orchestrator = FuzzOrchestrator(sandbox, island_keys, self.n_constraint)
         
         # 5. Open Real-Time CSV Logger
         with open(self.csv_path, mode='w', newline='') as csv_file:
@@ -95,14 +108,13 @@ class FuzzSession:
                 for gen in range(1, self.max_generations + 1):
                     logger.info(f"\n{'='*20} GENERATION {gen}/{self.max_generations} {'='*20}")
                     
-                    # Concurrently execute all 3 islands
-                    # This is where asyncio.gather proves its absolute superiority
+                    # Concurrently execute all 3 islands (Metaprogramming generation)
                     tasks = [
                         orchestrator.process_island_generation(session, island, ast_meta, comp_result, gen)
                         for island in orchestrator.islands
                     ]
                     
-                    # Wait for all 3 LLM calls + Sandboxes to finish their generation
+                    # Wait for all 3 LLM calls + Python Executions + Sandboxes to finish
                     island_results = await asyncio.gather(*tasks)
                     
                     # Extract the peak fitness (CPU ms) for graphing
@@ -144,9 +156,9 @@ if __name__ == "__main__":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         
     # Standard Execution Hook
-    # E.g. targeting a naive QuickSort file we scraped from Codeforces
-    target_cpp = "dataset/victim_quicksort.cpp" 
+    target_cpp = "dataset/victim_hashmap.cpp" 
     
+    # We are using 5000 as constraint because the LLM writes a Python loop now!
     session_runner = FuzzSession(target_cpp, n_constraint=5000)
     
     try:

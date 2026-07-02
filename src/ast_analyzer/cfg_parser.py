@@ -59,9 +59,9 @@ class AstAnalyzer:
     
     def __init__(self):
         # Initialize the C++ Grammar
-        self.language = tree_sitter.Language(tree_sitter_cpp.language())
+        self.language = tree_sitter.Language(tree_sitter_cpp.language(), "cpp")
         self.parser = tree_sitter.Parser()
-        self.parser.language = self.language
+        self.parser.set_language(self.language)
         
         # Nodes that signify a loop block in C++
         self.loop_node_types = {'for_statement', 'while_statement', 'do_statement'}
