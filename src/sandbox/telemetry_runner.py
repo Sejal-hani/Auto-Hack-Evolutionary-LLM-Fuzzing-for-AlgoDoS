@@ -135,7 +135,8 @@ class SecureSandbox:
             return ExecutionResult(
                 test_case_id=test_case.id,
                 status=ExecutionStatus.TIME_LIMIT_EXCEEDED,
-                exit_code=-signal.SIGKILL,
+                # exit_code=-signal.SIGKILL, linux one i dont have it
+                exit_code=-9,
                 telemetry=telemetry,
                 stdout=stdout_data,
                 stderr=stderr_data

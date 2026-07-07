@@ -4,4 +4,6 @@ __pycache__/
 *.exe
 results.csv
 .vscode/
+venv/
+
 
