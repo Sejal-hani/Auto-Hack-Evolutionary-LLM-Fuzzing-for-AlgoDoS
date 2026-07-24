@@ -102,7 +102,7 @@ class CppCompiler:
             # -fno-omit-frame-pointer: Leave hooks for OS-level CPU profiling
             compile_cmd = [
                 "g++",
-                "-std=c++20",
+                "-std=c++17",
                 opt_level.value,
                 "-fno-omit-frame-pointer", 
                 "-o", str(tmp_binary),

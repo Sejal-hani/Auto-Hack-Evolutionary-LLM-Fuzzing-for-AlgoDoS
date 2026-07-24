@@ -1,0 +1,28 @@
+digits_sequence_hard.py
+
+PROBLEM: B. Digits Sequence (Hard Edition) Concatenate positive
+integers 1, 2, 3, ... into an infinite string. Print the k-th digit of this
+sequence.
+
+Input: integer k (1 ≤ k ≤ 10^12).
+
+CODE:
+
+def solve():
+    k = int(input())
+    
+    length = 1
+    count = 9
+    start = 1
+    
+    while k > length * count:
+        k -= length * count
+        length += 1
+        count *= 10
+        start *= 10
+        
+    num = start + (k - 1) // length
+    s = str(num)
+    print(s[(k - 1) % length])
+
+solve()

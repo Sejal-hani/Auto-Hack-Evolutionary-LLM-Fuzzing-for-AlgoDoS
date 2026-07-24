@@ -1,0 +1,53 @@
+ greatest_convex.cpp
+
+PROBLEM: A. Greatest Convex You are given an integer k. Find the largest integer
+x, where 1 ≤ x < k, such that x! + (x − 1)! is a multiple of k, or determine
+that no such x exists.
+
+Input: The first line contains t (1 ≤ t ≤ 10^4) — the number of test cases. Each
+test case contains an integer k (2 ≤ k ≤ 10^9).
+
+CODE:
+
+#include <bits/stdc++.h>
+
+#define int long long
+#define fo(i, d, c, j) for (int i = d; i <= c; i += j)
+#define wh while
+#define fastIO ios_base::sync_with_stdio(false); cin.tie(NULL);
+#define en "\n"
+#define inf INT_MAX
+
+using namespace std;
+
+void TC() {
+    int k;
+    cin >> k;
+    int kk = k;
+    int mi = -inf;
+
+    fo(i, 2, sqrt(k), 1) {
+        int cnt = 0;
+        if (k % i == 0) {
+            wh(k % i == 0) {
+                cnt++;
+                k /= i;
+            }
+            int mo = cnt / i;
+            mo = (mo + 1) * mo / 2;
+            mi = max(mi, i * mo);
+        }
+    }
+    if (k > 1) mi = max(mi, k);
+
+    if (mi <= kk) cout << kk - 1 << en;
+    else cout << -1 << en;
+}
+
+signed main() {
+    fastIO;
+    int t;
+    cin >> t;
+    wh(t--) TC();
+    return 0;
+}

@@ -1,0 +1,94 @@
+// [N_CONSTRAINT]: 200000
+// [INPUT_FORMAT]: Three integers N, M, Q, followed by N integers, M integers, and Q integers.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+typedef long long ll;
+
+struct Item {
+    int val;
+    bool mine;
+};
+
+struct Group {
+    int l, r, count;
+    ll sum;
+};
+
+int main() {
+    int n, m, q;
+    cin >> n >> m >> q;
+    vector<Item> all;
+    ll current_sum = 0;
+    for (int i = 0; i < n; i++) {
+        int a; cin >> a;
+        all.push_back({a, true});
+        current_sum += a;
+    }
+    for (int i = 0; i < m; i++) {
+        int b; cin >> b;
+        all.push_back({b, false});
+    }
+    sort(all.begin(), all.end(), [](Item a, Item b) {
+        return a.val < b.val;
+    });
+
+    int total = n + m;
+    vector<ll> pref(total + 1, 0);
+    for (int i = 0; i < total; i++) pref[i + 1] = pref[i] + all[i].val;
+
+    vector<int> parent(total), sz(total), cnt(total);
+    iota(parent.begin(), parent.end(), 0);
+    for (int i = 0; i < total; i++) {
+        sz[i] = 1;
+        cnt[i] = all[i].mine ? 1 : 0;
+    }
+
+    auto get_group_sum = [&](int i) {
+        return pref[i + 1] - pref[i + 1 - cnt[i]];
+    };
+
+    function<int(int)> find = [&](int i) {
+        return parent[i] == i ? i : parent[i] = find(parent[i]);
+    };
+
+    auto unite = [&](int i, int j) {
+        i = find(i); j = find(j);
+        if (i != j) {
+            current_sum -= get_group_sum(i);
+            current_sum -= get_group_sum(j);
+            parent[i] = j;
+            cnt[j] += cnt[i];
+            sz[j] += sz[i];
+            current_sum += get_group_sum(j);
+        }
+    };
+
+    vector<pair<int, int>> diffs;
+    for (int i = 0; i < total - 1; i++) {
+        diffs.push_back({all[i + 1].val - all[i].val, i});
+    }
+    sort(diffs.begin(), diffs.end());
+
+    vector<pair<int, int>> queries(q);
+    for (int i = 0; i < q; i++) {
+        cin >> queries[i].first;
+        queries[i].second = i;
+    }
+    sort(queries.begin(), queries.end());
+
+    vector<ll> answers(q);
+    int ptr = 0;
+    for (auto &qu : queries) {
+        while (ptr < diffs.size() && diffs[ptr].first <= qu.first) {
+            unite(diffs[ptr].second, diffs[ptr].second + 1);
+            ptr++;
+        }
+        answers[qu.second] = current_sum;
+    }
+
+    for (ll a : answers) cout << a << "\n";
+    return 0;
+}

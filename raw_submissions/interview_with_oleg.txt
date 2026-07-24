@@ -1,0 +1,51 @@
+interview_with_oleg.cpp
+
+PROBLEM: A. Interview with Oleg Polycarp has interviewed Oleg and has written
+the interview down without punctuation marks and spaces to save time. Thus, the
+interview is now a string s consisting of n lowercase English letters. There is
+a filler word ogo in Oleg's speech. All words that can be obtained from ogo by
+adding go several times to the end of it are also considered fillers. For
+example, the words ogo, ogogo, ogogogo are fillers, but the words go, og, ogog,
+ogogog and oggo are not. The fillers have maximal size. For example, for ogogoo
+speech we can't consider ogo a filler and goo as a normal phrase. We should
+consider ogogo as a filler. To print the interview, Polycarp has to replace each
+of the fillers with three asterisks (***). Note that a filler word is replaced
+with exactly three asterisks regardless of its length.
+
+The first line contains a positive integer n (1 ≤ n ≤ 100) — the length of the
+interview. The second line contains the string s of length n, consisting of
+lowercase English letters.
+
+CODE:
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+    string s;
+    int n, l, k, z;
+
+    cin >> n;
+    cin >> s;
+
+    while (s.find("ogo") != -1) {
+        z = s.find("ogo");
+        l = 3;
+        k = 0;
+
+        while (k == 0 && l + 1 <= s.size()) {
+            if (s[z + l] == 'g' && s[z + l + 1] == 'o') {
+                l += 2;
+            } else {
+                s.erase(z, l);
+                k = 1;
+                s.insert(z, "***");
+            }
+        }
+    }
+
+    cout << s;
+    return 0;
+}

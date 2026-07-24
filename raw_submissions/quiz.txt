@@ -1,0 +1,53 @@
+quiz.cpp
+
+PROBLEM: A. Quiz Manao is taking part in a quiz. The quiz consists of n
+consecutive questions. A correct answer gives one point. When the player answers
+a question correctly, a counter of consecutive correct answers increases by 1.
+If it reaches k, it resets to 0 and the total score is doubled (after adding the
+point). If a question is answered incorrectly, the counter resets. Manao
+answered exactly m questions correctly. Find the minimum possible score he could
+have achieved, modulo 1000000009.
+
+Input: A single line contains three integers n, m and k (2 ≤ k ≤ n ≤ 10^9; 0 ≤ m
+≤ n).
+
+CODE:
+
+#include <iostream>
+#include <algorithm>
+#include <cassert>
+
+using namespace std;
+
+#define LL long long
+#define MOD 1000000009
+
+int main() {
+    LL n, m, k;
+    cin >> n >> m >> k;
+    LL s = n / k;
+    LL t = (k - 1) * s + (n % k);
+
+    if (t >= m) {
+        cout << m << endl;
+        return 0;
+    }
+
+    LL d = m - t;
+    LL ans = 1;
+    LL base = 2;
+    LL exp = d;
+
+    while (exp > 0) {
+        if (exp % 2 == 1) ans = (ans * base) % MOD;
+        base = (base * base) % MOD;
+        exp /= 2;
+    }
+
+    ans = (ans - 1 + MOD) % MOD;
+    ans = (ans * 2 * k) % MOD;
+    ans = (ans + (m - d * k)) % MOD;
+
+    cout << (ans + MOD) % MOD << endl;
+    return 0;
+}
