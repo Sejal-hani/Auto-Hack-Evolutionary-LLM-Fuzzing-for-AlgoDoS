@@ -41,22 +41,22 @@
 
 ---
 
-## 🔍 Overview
+## Overview
 
 **Auto-Hack** is a research-oriented framework designed to automatically discover worst-case execution inputs for C++ programs. 
 
 Unlike traditional fuzzers that prioritize crashes or memory corruption, this framework searches for **inputs that maximize execution time**, exposing algorithmic complexity vulnerabilities (such as Algorithmic Denial of Service).
 
 The framework integrates:
-* 🔍 **Static Source-Code Analysis** via Tree-sitter.
-* 🤖 **LLM-Assisted Input Generation** via Groq & Llama 3.
-* 🧬 **Evolutionary Optimization** (Genetic Algorithms) to evolve input structures.
-* ⏱️ **Runtime Benchmarking** within an isolated execution sandbox.
-* 🛠️ **Automated Repair Loops** to fix malformed inputs dynamically.
+*  **Static Source-Code Analysis** via Tree-sitter.
+*  **LLM-Assisted Input Generation** via Groq & Llama 3.
+*  **Evolutionary Optimization** (Genetic Algorithms) to evolve input structures.
+*  **Runtime Benchmarking** within an isolated execution sandbox.
+*  **Automated Repair Loops** to fix malformed inputs dynamically.
 
 ---
 
-## 💡 Motivation
+## Motivation
 
 Many production systems and competitive programming solutions contain hidden worst-case execution complexities that are rarely triggered during typical testing. 
 
@@ -70,7 +70,7 @@ Auto-Hack automates the search for these pathological edge cases through combine
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 * **LLM-Guided Fuzzing**: Generates highly structured, context-aware inputs instead of raw random mutation.
 * **Evolutionary Engine**: Optimizes input structures over multiple generations to find execution bottlenecks.
@@ -81,7 +81,7 @@ Auto-Hack automates the search for these pathological edge cases through combine
 
 ---
 
-## 🗺️ System Architecture & Workflows
+## System Architecture & Workflows
 
 ### System Workflow
 ```mermaid
@@ -139,7 +139,7 @@ flowchart TD
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Core Technologies
 
@@ -155,7 +155,7 @@ flowchart TD
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 Auto-Hack/
@@ -182,7 +182,7 @@ Auto-Hack/
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 ### Installation
 
@@ -235,7 +235,7 @@ POPULATION_SIZE=20
 
 ---
 
-## 🧩 Core Components
+## Core Components
 
 ### Sandbox Execution
 The execution sandbox limits exposure and maintains testing safety. It is responsible for:
@@ -271,7 +271,7 @@ Before execution inside the target binary, candidate inputs undergo structural v
 
 ---
 
-## 📊 Telemetry & Logging
+## Telemetry & Logging
 
 The system saves and processes continuous performance indicators across multiple export files:
 
@@ -284,7 +284,7 @@ The system saves and processes continuous performance indicators across multiple
 
 ---
 
-## 🔮 Research & Future Directions
+## Research & Future Directions
 
 * **Multi-Language Support:** Extending targets to Rust, Go, and Java.
 * **Distributed Benchmarking:** Distributing candidate execution across multiple nodes.
@@ -294,7 +294,7 @@ The system saves and processes continuous performance indicators across multiple
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome structural improvements, research papers, and code contributions.
 1. Fork this repository.
