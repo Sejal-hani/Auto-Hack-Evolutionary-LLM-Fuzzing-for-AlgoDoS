@@ -1,7 +1,8 @@
 // [TIME_LIMIT_MS]: 2000
 // [MEMORY_LIMIT_MB]: 256
 // [N_CONSTRAINT]: 200000 (unused in this file's logic; misc constant)
-// [INPUT_FORMAT]: T; per case: six integers l1,b1,l2,b2,l3,b3. Matches label.
+// [INPUT_FORMAT]: T; per case: six integers l1,b1,l2,b2,l3,b3. 
+
 #include <bits/stdc++.h>
 using namespace std;
 #define nline "\n"
