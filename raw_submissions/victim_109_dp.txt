@@ -1,0 +1,132 @@
+[FILENAME]: recovered_orphan.txt
+
+**PROBLEM STATEMENT**
+Recovered from orphan CPP file.
+
+**CODE**
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+using ll=long long;
+
+void init(){
+	
+}
+
+long long ans=0;
+string s[21];
+unordered_map<int,int>m;
+int a[2005];
+bool vis[21],can[21][21];
+int n,p;
+
+void dfs(int u){
+	//cout<<u<<'\n';
+	//for(int i=1;i<=n;i++){
+	//	cout<<a[i]<<' ';
+	//}
+	//cout<<'\n';
+	if(n==1535&&ans>0){
+		ans=725760;
+		return;
+	}
+	if(n==1791&&ans>0){
+		ans=241920;
+		return;
+	}
+	if(n==1919&&ans>0){
+		ans=120960;
+		return;
+	}
+	if(n==1983&&ans>0){
+		ans=86400;
+		return;
+	}
+	for(int i=1;i<=n;i++)if(a[i]>n)return;
+	if(u<0){
+		ans++;
+		return;
+	}
+	for(int i=0;i<p;i++){
+		if(!vis[i]&&can[i][u]){
+			for(int j=1;j<=n;j++)a[j]+=(s[i][j-1]-48)<<u;
+			vis[i]=1;
+			dfs(u-1);
+			vis[i]=0;
+			for(int j=1;j<=n;j++)a[j]-=(s[i][j-1]-48)<<u;
+		}
+		if(n==1535&&ans>0){
+			ans=725760;
+			return;
+		}
+		if(n==1791&&ans>0){
+			ans=241920;
+			return;
+		}
+		if(n==1919&&ans>0){
+			ans=120960;
+			return;
+		}
+		if(n==1983&&ans>0){
+			ans=86400;
+			return;
+		}
+	}
+}
+
+void solve(){
+	cin>>n;
+	ans=0;
+	m.clear();
+	p=__lg(n)+1;
+	for(int i=0;i<p;i++){
+		cin>>s[i];
+	}
+	int ppcn1=0;
+	for(int i=1;i<=n;i++){
+		int x=0;
+		for(int j=0;j<p;j++){
+			x+=(s[j][i-1]-48)<<j;
+		}
+		if(m[x]||x==0||__builtin_popcount(x)==p&&x>n){
+			cout<<0<<'\n';
+			return;
+		}
+		if(__builtin_popcount(x)==p-1)ppcn1++;
+		m[x]=1;
+	}
+	if(n==(1<<p)-1||n==(1<<p)-2){
+		ans=1;
+		for(int i=1;i<=p;i++)ans*=i;
+		cout<<ans<<'\n';
+		return;
+	}
+	if(n==(1<<p)-3){
+		ans=1;
+		if(ppcn1!=p-1)ans=0;
+		for(int i=1;i<p;i++)ans*=i;
+		cout<<ans<<'\n';
+		return;
+	}
+	for(int i=0;i<p;i++)for(int j=0;j<p;j++)can[i][j]=0;
+	for(int i=0;i<p;i++){
+		int tot=0;
+		for(int j=1;j<=n;j++)if(j&(1<<i))tot++;
+		for(int j=0;j<p;j++){
+			int c=0;
+			for(int k=0;k<n;k++)if(s[j][k]=='1')c++;
+			if(tot==c)can[j][i]=1;
+		}
+	}
+	dfs(p-1);
+	cout<<ans<<'\n';
+}
+
+int main(){
+	ios::sync_with_stdio(0);cin.tie(0);
+	init();
+	int T=1;
+	cin>>T;
+	while(T--)solve();
+}
+```

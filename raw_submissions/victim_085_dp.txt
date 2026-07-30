@@ -1,0 +1,80 @@
+[FILENAME]: recovered_orphan.txt
+
+**PROBLEM STATEMENT**
+Recovered from orphan CPP file.
+
+**CODE**
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cmath>
+#include <string>
+#include <map>
+#include <set>
+#include <deque>
+#include <climits>
+#include <iomanip>
+#include <queue>
+using namespace std;
+using ll = long long;
+
+struct Point {
+    ll x, y;
+};
+
+bool comparePoints(const Point& a, const Point& b) {
+    if (a.x == b.x) {
+        return a.y < b.y;
+    }
+    return a.x < b.x;
+}
+
+ll orientation(const Point& p, const Point& q, const Point& r) {
+    ll val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (val == 0) {
+        return 0; // Collinear
+    }
+    return (val > 0) ? 1 : 2; // Clockwise or counterclockwise
+}
+
+bool isConvex(const vector<Point>& points, ll i, ll j, ll k) {
+    return orientation(points[i], points[j], points[k]) == 2;
+}
+
+ll minSwaps(vector<Point>& points) {
+    ll n = points.size();
+    sort(points.begin(), points.end(), comparePoints);
+    ll ans = 0;
+    for (ll i = 0; i < n; i++) {
+        if (isConvex(points, i, (i + 1) % n, (i + 2) % n)) {
+            continue;
+        }
+        ll j = (i + 2) % n;
+        while (!isConvex(points, i, j, (j + 1) % n)) {
+            j = (j + 1) % n;
+        }
+        ans += j - i;
+        i = j;
+    }
+    return ans;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<Point> points(n);
+        for (ll i = 0; i < n; i++) {
+            cin >> points[i].x >> points[i].y;
+        }
+        cout << minSwaps(points) << endl;
+    }
+    return 0;
+}
+```

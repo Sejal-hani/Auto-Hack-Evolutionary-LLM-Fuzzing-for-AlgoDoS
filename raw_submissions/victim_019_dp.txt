@@ -1,0 +1,66 @@
+[filename]: F. Maximum modulo equality.txt
+
+**PROBLEM STATEMENT**
+
+Shohag has two integers `x` and `m`. Help him count the number of integers `1≤y≤m` such that `x⊕y` is divisible by either `x`, `y`, or both. Here `⊕` is the bitwise XOR operator.
+
+**LIMITS**
+
+- time limit per test: 2 seconds
+- memory limit per test: 256 megabytes
+
+**CODE**
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+#define ld long double
+#define int long long
+#define mod 998244353
+
+int ans[100005], mmax[100005];
+
+void pre() {
+    mmax[0] = 0;
+    mmax[1] = 1;
+    ans[1] = 1;
+    for (int i = 2; i <= 100000; i++) {
+        int v[100005] = {0};
+        int cnt = 2;
+        for (int j = 2; j * j <= i; j++) {
+            if (i % j != 0) continue;
+            v[ans[j]] = 1;
+            v[ans[i / j]] = 1;
+            while (v[cnt] == 1) cnt++;
+        }
+        ans[i] = cnt;
+        mmax[i] = max(mmax[i - 1], ans[i]);
+    }
+}
+
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    int a[m + 1], b[n + 1];
+    for (int i = 1; i <= m; i++) cin >> a[i];
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        if ((n ^ i) <= m) ans++;
+    }
+    cout << ans << endl;
+}
+
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    int t;
+    t = 1;
+    cin >> t;
+    pre();
+    while (t--) {
+        solve();
+    }
+    return 0;
+}
+```

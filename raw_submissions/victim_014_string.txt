@@ -1,0 +1,60 @@
+[filename]: jumping_on_tiles.txt
+
+**PROBLEM STATEMENT**
+
+Polycarp has a string consisting of lowercase Latin letters. He encodes it using the following algorithm. He goes through the letters of the string from left to right and for each letter Polycarp considers its number in the alphabet:
+
+- If the letter number is a single-digit number (less than 10), then just writes it out;
+- If the letter number is a two-digit number (greater than or equal to 10), then it writes it out and adds the number 0 after.
+
+You are given a string resulting from encoding the string . Your task is to decode it (get the original string by ).
+
+**LIMITS**
+
+- The first line of the input contains an integer (1≤q≤104) — the number of test cases in the input.
+- The descriptions of the test cases follow.
+- The first line of description of each test case contains an integer (1≤n≤50) — the length of the given code.
+- The second line of the description of each test case contains a string of length  — the given code.
+- It is guaranteed that there exists such a string of lowercase Latin letters, as a result of encoding which the string is obtained.
+- It is guaranteed that such a string always exists. It can be shown that such a string is always unique.
+
+**CODE**
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(){
+   int test;
+   scanf("%d", &test);
+   // test = 1;
+   char s[51];
+   char ans[51];
+   while(test--){
+       int n;
+       scanf("%d", &n);
+       scanf("\n");
+       scanf("%s", s);
+       scanf("\n");
+       int len = 0;
+       for(int i = n - 1; i >= 0; i--){
+           if(s[i] == '0'){
+               int temp = s[i - 1] - '0' + (s[i - 2] - '0')*10 - 1;
+               ans[len] = 'a' + temp;
+               len++;
+               i -= 2;
+           }else{
+               ans[len] = 'a' + (s[i] - '0') - 1;
+               len++;
+           }
+       }
+       for(int i = len - 1; i >= 0; i--){
+           printf("%c", ans[i]);
+       }
+       printf("\n");
+   }
+   return 0;
+}
+```

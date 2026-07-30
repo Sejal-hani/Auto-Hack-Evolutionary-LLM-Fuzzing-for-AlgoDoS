@@ -1,0 +1,93 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 500005
+// [INPUT_FORMAT]: T; per case: N, M, then M triples (u,v,c).
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <utility>
+#include <set>
+using std::cin, std::cout;
+
+#define F(i, a, b) for(int i = a; i <= (b); ++i)
+#define F2(i, a, b) for(int i = a; i < (b); ++i)
+#define dF(i, a, b) for(int i = a; i >= (b); --i)
+#define debug(...) std::fprintf(stderr, __VA_ARGS__)
+#define Debug debug("Passing [%s] in LINE %d\n", __FUNCTION__, __LINE__)
+
+void Solve();
+int main() {
+    cin.sync_with_stdio(false);
+    cin.tie(nullptr);
+    int tests = 1;
+    cin >> tests;
+    while (tests--)
+        Solve();
+    return 0;
+}
+
+using LL = long long;
+const int Mod = 998244353;
+
+const int Inf = 0x3f3f3f3f;
+const LL InfLL = 0x3f3f3f3f3f3f3f3f;
+
+const int MN = 500005;
+
+int n, m;
+int d[MN], r[MN];
+std::vector<int> H[MN];
+std::multiset<int> G[MN];
+
+void DFS(int u) {
+    r[u] = 1;
+    for (int v : H[u]) if (!r[v]) {
+        DFS(v);
+        if (d[v] & 1) {
+            G[u].insert(v);
+            G[v].insert(u);
+            ++d[u], ++d[v];
+        }
+    }
+}
+
+int ans[MN], t;
+void Hierholzer(int u) {
+    while (true) {
+        if (G[u].empty())
+            break;
+        auto it = G[u].begin();
+        int v = *it;
+        G[u].erase(it);
+        G[v].erase(G[v].find(u));
+        Hierholzer(v);
+        ans[++t] = v;
+    }
+}
+
+void Solve() {
+    cin >> n >> m;
+    F(i, 1, n) G[i].clear(), H[i].clear(), d[i] = r[i] = 0;
+    F(i, 1, m) {
+        int u, v, c;
+        cin >> u >> v >> c;
+        if (c)
+            ++d[u], ++d[v],
+            G[u].insert(v),
+            G[v].insert(u);
+        else
+            H[u].push_back(v),
+            H[v].push_back(u);
+    }
+    F(i, 1, n) if (!r[i]) {
+        DFS(i);
+        if (d[i] & 1)
+            return void(cout << "NO\n");
+    }
+    t = 0;
+    Hierholzer(1);
+    cout << "YES\n" << t << '\n';
+    F(i, 1, t)
+        cout << ans[i] << ' ';
+    cout << "1\n";
+}

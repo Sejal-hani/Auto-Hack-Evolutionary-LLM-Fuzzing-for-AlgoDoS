@@ -1,0 +1,124 @@
+[filename]: name.txt
+
+**PROBLEM STATEMENT**
+
+A new semester is about to begin, and it is necessary to create a schedule for the first day. There are a total of `n` groups and `m` classrooms in the faculty. It is also known that each group has exactly `6` classes on the first day, and the `k`-th class of each group takes place at the same time. Each class must be held in a classroom, and at the same time, there cannot be classes for more than one group in the same classroom.
+
+Each classroom has its own index (at least three digits), and all digits of this index, except for the last two, indicate the floor on which the classroom is located. For example, classroom `479` is located on the `4`-th floor, while classroom `31415` is on the `314`-th floor. Between floors, one can move by stairs; for any floor `x>1`, one can either go down to floor `x−1` or go up to floor `x+1`; from the first floor, one can only go up to the second; from the floor `107` (which is the last one), it is possible to go only to the floor `9999999`.
+
+The faculty's dean's office has decided to create the schedule in such a way that students move as much as possible between floors, meaning that the total number of movements between floors across all groups should be maximized. When the students move from one floor to another floor, they take the shortest path.
+
+**LIMITS**
+
+- Time limit per test: 2.5 seconds
+- Memory limit per test: 512 megabytes
+- Number of test cases: `t` (1≤`t`≤10^3)
+- Number of groups: `n` (1≤`n`≤10^5)
+- Number of classrooms: `m` (1≤`m`≤10^5)
+- Each group has exactly `6` classes on the first day
+- Each class must be held in a classroom, and at the same time, there cannot be classes for more than one group in the same classroom
+- Each classroom has its own index (at least three digits)
+- All digits of this index, except for the last two, indicate the floor on which the classroom is located
+
+**CODE**
+
+```java
+import java.awt.geom.Line2D;
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    static FastReader fr = new FastReader();
+    static PrintWriter out = new PrintWriter(System.out);
+
+    public static void Solve() {
+        int t = fr.nextInt();
+        for(int test = 0; test < t; test++) {
+            int n = fr.nextInt();
+            int m = fr.nextInt();
+            long Seq [] = new long [m];
+            for(int i=0; i<m; i++) {
+                Seq[i] = fr.nextInt();
+            }
+            Arrays.sort(Seq);
+            long ans = 0l;
+            int r=m-1;
+            int l=0;
+            while (n > 0) {
+                ans += ((Seq[r]/100) - (Seq[l]/100)) * 10l;
+                for(int i=0; i<6; i++) {
+                    if((i & 1) == 0) out.print(Seq[r] + " ");
+                    else out.print(Seq[l] + " ");
+                }
+                out.println();
+
+                if(l == r || n == 1) {
+                    n-=2;
+                    break;
+                }
+
+                for(int i=0; i<6; i++) {
+                    if((i & 1) == 0) out.print(Seq[l] + " ");
+                    else out.print(Seq[r] + " ");
+                }
+                out.println();
+                r--;
+                l++;
+                n-=2;
+            }
+        }
+    }
+
+    public static int gcd(int a, int b){
+        if(a == 0){
+            return b;
+        }
+        return gcd(b % a, a);
+    }
+
+    public static int LCM(int a, int b){
+        return  (a * b) / gcd(a, b);
+    }
+
+    public static int [] GivePrime(int n) {
+        int [] prime = new int [n+1];
+        for(int i=2; i*i <= n; i++) {
+            if(prime[i] != 0) continue;
+            for(int j=2*i; j<=n; j+=i) prime[j] = i;
+        }
+        return prime;
+    }
+
+    public static void main(String args[]) throws IOException {
+        int t = fr.nextInt();
+        for(int i=0; i<t; i++) {
+            Solve();
+        }
+        out.close();
+    }
+
+    static class FastReader {
+        BufferedReader br;
+        StringTokenizer st;
+        public FastReader() {br = new BufferedReader(new InputStreamReader(System.in));}
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {st = new StringTokenizer(br.readLine());}
+                catch (IOException e) {e.printStackTrace();}
+            }
+            return st.nextToken();
+        }
+        int nextInt() {return Integer.parseInt(next());}
+        long nextLong() {return Long.parseLong(next());}
+        double nextDouble() {return Double.parseDouble(next());}
+        String nextLine() {
+            String str = "";
+            try {
+                if (st.hasMoreTokens()) {str = st.nextToken("\n");}
+                else {str = br.readLine();}
+            } catch (IOException e) {e.printStackTrace();}
+            return str;
+        }
+    }
+}
+```

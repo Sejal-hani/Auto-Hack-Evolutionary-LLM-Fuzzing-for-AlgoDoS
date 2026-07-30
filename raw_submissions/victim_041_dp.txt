@@ -1,0 +1,63 @@
+right_maximum.cpp
+
+PROBLEM: B. Right Maximum You are given an array a consisting of n integers. While the array is not empty, an operation is performed consisting of two steps: first, the maximum element in the array is chosen (if there are multiple maximum elements, the rightmost maximum is chosen); then, all elements after the chosen element, including it, are removed from the array. Your task is to calculate the number of operations that will be performed before the array becomes empty.
+
+Input: The first line contains one integer t (1 ≤ t ≤ 10^4) — the number of test cases. Each test case consists of two lines: the first line contains one integer n (2 ≤ n ≤ 2⋅10^5); the second line contains n integers a_1, a_2, ..., a_n (1 ≤ a_i ≤ n). Additional constraint on the input: the sum of n over all test cases does not exceed 2⋅10^5.
+
+CODE:
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+void solve() {
+int n;
+cin >> n;
+vector a(n);
+for (int i = 0; i < n; i++) {
+cin >> a[i];
+}
+
+```
+int ops = 0;
+int curr = n - 1;
+
+while (curr >= 0) {
+    int max_val = -1;
+    int max_idx = -1;
+
+    // Traverse remaining elements to find the rightmost maximum
+    for (int i = 0; i <= curr; i++) {
+        if (a[i] >= max_val) {
+            max_val = a[i];
+            max_idx = i;
+        }
+    }
+
+    // Remove element at max_idx and everything after it
+    curr = max_idx - 1;
+    ops++;
+}
+
+cout << ops << "\n";
+
+```
+
+}
+
+int main() {
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+
+```
+int t;
+cin >> t;
+while (t--) {
+    solve();
+}
+
+return 0;
+
+```
+
+}

@@ -1,0 +1,137 @@
+sum_of_fractions.cpp
+
+PROBLEM: F. Sum of Fractions Let's call an increase of the fraction x/y one of the following operations: either increase its numerator x by 1; or, if the denominator y > 1, decrease its denominator y by 1. Note that the fraction is not reduced after the increase. For example, if you have a fraction 3/7 and you decrease its denominator by 1, you get 3/6, not 1/2. Suppose you are given an integer array b_1, b_2, ..., b_m and an integer k. You apply the following algorithm: Construct the array 1/b_1, 1/b_2, ..., 1/b_m. Choose any of the fractions and increase it. Repeat the previous step k times (the same fraction can be chosen multiple times). Calculate the sum of the resulting fractions. We will denote MSF(b, k) as the maximum sum of fractions that can be obtained from the array b by applying the increase operation exactly k times. Let a[l..r] be the subarray a_l, a_{l+1}, ..., a_r of the array a. You are given two arrays of integers a_1, a_2, ..., a_n and k_1, k_2, ..., k_m. For each k_i, calculate the sum of MSF(a[l..r], k_i) over all subarrays of the array a and output the answer modulo 998244353.
+
+Input: The first line contains two integers n and m (1 ≤ n, m ≤ 5⋅10^5) — the sizes of the arrays a and k. The second line contains n integers a_1, a_2, ..., a_n (1 ≤ a_i ≤ 10^8) — the array a. The third line contains m integers k_1, k_2, ..., k_m (0 ≤ k_1 ≤ k_2 ≤ ... ≤ k_m ≤ 10^8) — the array k in non-decreasing order.
+
+CODE:
+
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+
+static const int MOD = 998244353;
+
+long long power(long long base, long long exp) {
+    long long res = 1;
+    base %= MOD;
+    while (exp > 0) {
+        if (exp % 2 == 1) res = (res * base) % MOD;
+        base = (base * base) % MOD;
+        exp /= 2;
+    }
+    return res;
+}
+
+long long modInverse(long long n) {
+    return power(n, MOD - 2);
+}
+
+struct Element {
+    long long v;
+    long long c;
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+
+    vector<long long> a(n + 1);
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+    }
+
+    vector<pair<long long, int>> k_queries(m);
+    for (int i = 0; i < m; i++) {
+        cin >> k_queries[i].first;
+        k_queries[i].second = i;
+    }
+
+    vector<int> L(n + 1), R(n + 1);
+    vector<int> st;
+
+    for (int i = 1; i <= n; i++) {
+        while (!st.empty() && a[st.back()] >= a[i]) {
+            st.pop_back();
+        }
+        L[i] = st.empty() ? 0 : st.back();
+        st.push_back(i);
+    }
+
+    st.clear();
+    for (int i = n; i >= 1; i--) {
+        while (!st.empty() && a[st.back()] > a[i]) {
+            st.pop_back();
+        }
+        R[i] = st.empty() ? n + 1 : st.back();
+        st.push_back(i);
+    }
+
+    long long base_sum = 0;
+    vector<Element> elems(n);
+
+    for (int i = 1; i <= n; i++) {
+        long long inv_a = modInverse(a[i]);
+        long long subarray_count = (1LL * i * (n - i + 1)) % MOD;
+        base_sum = (base_sum + subarray_count * inv_a) % MOD;
+
+        long long c = (1LL * (i - L[i]) % MOD) * ((R[i] - i) % MOD) % MOD;
+        elems[i - 1] = {a[i], c};
+    }
+
+    sort(elems.begin(), elems.end(), [](const Element& x, const Element& y) {
+        return x.v < y.v;
+    });
+
+    long long S_gt_inv = 0;
+    for (int i = 0; i < n; i++) {
+        long long inv_v = modInverse(elems[i].v);
+        S_gt_inv = (S_gt_inv + elems[i].c * inv_v) % MOD;
+    }
+
+    long long S_le_one = 0;
+    long long S_le_rest = 0;
+
+    vector<long long> ans(m);
+    int ptr = 0;
+
+    for (int i = 0; i < m; i++) {
+        long long k = k_queries[i].first;
+
+        while (ptr < n && elems[ptr].v <= k) {
+            long long v = elems[ptr].v;
+            long long c = elems[ptr].c;
+            long long inv_v = modInverse(v);
+
+            S_gt_inv = (S_gt_inv - c * inv_v % MOD + MOD) % MOD;
+            S_le_one = (S_le_one + c) % MOD;
+
+            long long rest_term = (2 - (v % MOD) - inv_v) % MOD;
+            if (rest_term < 0) rest_term += MOD;
+
+            S_le_rest = (S_le_rest + c * rest_term) % MOD;
+
+            ptr++;
+        }
+
+        long long k_mod = k % MOD;
+        long long cur_ans = base_sum;
+        cur_ans = (cur_ans + k_mod * S_gt_inv) % MOD;
+        cur_ans = (cur_ans + k_mod * S_le_one) % MOD;
+        cur_ans = (cur_ans + S_le_rest) % MOD;
+
+        ans[k_queries[i].second] = cur_ans;
+    }
+
+    for (int i = 0; i < m; i++) {
+        cout << ans[i] << "\n";
+    }
+
+    return 0;
+}
+
+```

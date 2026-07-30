@@ -1,0 +1,124 @@
+[FILENAME]: recovered_orphan.txt
+
+**PROBLEM STATEMENT**
+Recovered from orphan CPP file.
+
+**CODE**
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+#define pb                push_back
+#define ll                long long
+#define pob               pop_back
+#define pf                push_front
+#define ppf               pop_front
+#define ff                first
+#define ss                second
+#define all(x)            (x).begin(),(x).end()
+#define rep(i,a,b)        for(int i=a;i<b;i++)
+#define sz(x)             (int)((x).size())
+#define int               long long
+#define ppc               __builtin_popcount
+#define ppcll             __builtin_popcountll
+#define ctz               __builtin_ctz
+
+const ll MOD = 1e9 + 7;
+const ll INF = 1e18;
+const int N = 2002;
+int dp[N][N];
+
+int solve(int indi, int indj, string s) {
+    if (indi > indj) {
+        return 0;
+    }
+    if (dp[indi][indj] != -1) {
+        return dp[indi][indj];
+    }
+
+    int res1 = 0;
+    res1 = solve(indi + 2, indj, s);
+    if (res1 == 0) {
+        if (s[indi] > s[indi + 1]) {
+            res1 = 2;
+        }
+
+        if (s[indi] < s[indi + 1]) {
+            res1 = 1;
+        }
+    }
+
+    int res2 = 0;
+    res2 = solve(indi + 1, indj - 1, s);
+
+    if (s[indi] > s[indj] && res2 == 0) {
+        res2 = 2;
+    }
+
+    if (s[indi] < s[indj] && res2 == 0) {
+        res2 = 1;
+    }
+    int res3 = 0;
+    res3 = solve(indi + 1, indj - 1, s);
+
+    if (s[indj] > s[indi] && res3 == 0) {
+        res3 = 2;
+    }
+
+    if (s[indj] < s[indi] && res3 == 0) {
+        res3 = 1;
+    }
+
+    int res4 = 0;
+
+    res4 = solve(indi, indj - 2, s);
+
+    if (s[indj - 1] < s[indj] && res4 == 0) {
+        res4 = 2;
+    }
+
+    if (s[indj - 1] > s[indj] && res4 == 0) {
+        res4 = 1;
+    }
+    if ((res1 == 1 && res2 == 1) or (res3 == 1 && res4 == 1)) {
+        return dp[indi][indj] = 1;
+    }
+
+    if (((res1 == 0 or res2 == 0) && (res1 != 2 && res2 != 2)) or ((res3 == 0 or  res4 == 0 ) && (res3 != 2 && res4 != 2))) {
+        return dp[indi][indj] = 0;
+    }
+    return dp[indi][indj] = 2;
+}
+
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0); cout.tie(0);
+    int t = 1;
+    cin >> t;
+    while (t--) {
+        string s;
+        cin >> s;
+        int n = sz(s);
+        int i = 0, j = sz(s) - 1;
+        for (int i = 0; i <= n ; ++i)
+        {
+            for (int j = 0; j <= n ; ++j)
+            {
+                dp[i][j] = -1;
+            }
+        }
+
+        int ans = solve(0, n - 1, s);
+
+        if (ans == 0) {
+            cout << "Draw" << "\n";
+        }
+        else if (ans == 1) {
+            cout << "Alice" << "\n";
+        } else {
+            cout << "Bob" << "\n";
+        }
+    }
+    return 0;
+}
+```

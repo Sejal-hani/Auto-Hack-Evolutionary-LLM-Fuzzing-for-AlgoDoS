@@ -1,0 +1,33 @@
+[FILENAME]: recovered_orphan.txt
+
+**PROBLEM STATEMENT**
+Recovered from orphan CPP file.
+
+**CODE**
+```cpp
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+    int t;
+    cin >> t;
+
+    while (t--) {
+        string x;
+        cin >> x;
+
+        char c = x[0];
+        for (int i = 1; i < x.length(); i++) {
+            if (c > x[i]) {
+                c = x[i];
+            }
+        }
+
+        cout << c << endl;
+    }
+
+    return 0;
+}
+```

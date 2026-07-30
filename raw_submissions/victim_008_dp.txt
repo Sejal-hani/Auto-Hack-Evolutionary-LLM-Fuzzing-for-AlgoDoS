@@ -1,0 +1,83 @@
+[filename]: name.txt
+
+**PROBLEM STATEMENT**
+
+Stanley defines the beauty of an array `a` of length `n`, which contains non-negative integers, as follows: `∑i=1n⌊ai/k⌋`, which means that we divide each element by `k`, round it down, and sum up the resulting values. Stanley told Sam the integer `k` and asked him to find an array `a` of `n` non-negative integers, such that the beauty is equal to `b` and the sum of elements is equal to `s`. Help Sam — find any of the arrays satisfying the conditions above.
+
+**LIMITS**
+
+- Time limit per test: 1 second
+- Memory limit per test: 256 megabytes
+- Number of test cases: `1 ≤ t ≤ 1000`
+- Array length: `1 ≤ n ≤ 10^5`
+- Divisor: `1 ≤ k ≤ 10^9`
+- Beauty: `0 ≤ b ≤ 10^9`
+- Sum of elements: `0 ≤ s ≤ 10^18`
+
+**CODE**
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+#define IOS ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
+#define pb push_back
+#define int long long int
+
+signed main()
+{
+    IOS
+    int t;
+
+    cin >> t;
+    while (t--)
+    {
+        int n, k, b, s;
+        cin >> n >> k >> b >> s;
+
+        if (k == 1)
+        {
+            if (n < s)
+            {
+                cout << -1 << endl;
+            }
+            else
+            {
+                for (int i = 0; i < n - 1; i++)
+                {
+                    cout << 0 << " ";
+                }
+                cout << s << endl;
+            }
+        }
+        else
+        {
+            int xx = min(s, k * (b) + k - 1);
+            int yy = ((s - xx) / (k - 1));
+            int z = (s - xx) % (k - 1);
+            int c = (z == 0) ? 0 : 1;
+            if (k * b > s)
+            {
+                cout << -1 << endl;
+            }
+            else if (yy + 1 + c > n)
+            {
+                cout << -1 << endl;
+            }
+            else
+            {
+                for (int i = 0; i < yy; i++)
+                {
+                    cout << k - 1 << " ";
+                }
+                if (c) cout << (s - xx) % (k - 1) << " ";
+                for (int i = yy + c; i < n - 1; i++)
+                {
+                    cout << 0 << " ";
+                }
+                cout << xx << endl;
+            }
+        }
+    }
+    return 0;
+}
+```

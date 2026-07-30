@@ -1,0 +1,62 @@
+[1-1-1, Free Tree!.txt]
+
+**PROBLEM STATEMENT**
+
+Given two arrays `p` and `s` of length `n`, where `p` is the prefix GCD of some array `a`, and `s` is the suffix GCD of the same array `a`, determine whether there exists such an array `a` for which the given arrays `p` and `s` can be obtained.
+
+**LIMITS**
+
+- Time limit per test: 2 seconds
+- Memory limit per test: 256 megabytes
+- Number of test cases: up to 10^4
+- Array length: up to 10^5
+- Array elements: up to 10^9
+
+**CODE**
+
+```cpp
+#include "bits/stdc++.h"
+using namespace std;
+using ll = __INT64_TYPE__;
+
+void run_case() {
+  int n; cin >> n;
+  vector<int> p(n), s(n);
+  for(int& i:p) cin >> i;
+  for(int& i:s) cin >> i;
+
+  vector<int> a(n);
+  for (int i = 0; i < n; i++) {
+    a[i] = lcm(p[i], s[i]);
+  }
+
+  int pref = 0;
+  int suf = 0;
+
+  for (int i = 0; i < n; ++i) {
+    pref = gcd(a[i], pref);
+    suf = gcd(suf, a[n - 1 - i]);
+
+    if (pref != p[i] || suf != s[n - 1 - i]) {
+      std::cout << "NO\n"; return;
+    }
+  }
+
+  std::cout << "YES\n";
+  return;
+}
+
+__INT32_TYPE__ main () {
+  std::ios_base::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
+  int Ti = 1;
+  std::cin >> Ti;
+  for (int i = 1; i <= Ti; i++) {
+    std::cerr << "Case #" << i << '\n';
+    run_case();
+    std::cerr << "\n-----------------\n";
+  }
+  return EXIT_SUCCESS;
+}
+```

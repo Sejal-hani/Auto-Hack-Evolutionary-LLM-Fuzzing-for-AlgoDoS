@@ -1,0 +1,138 @@
+[filename]: name.txt
+
+**PROBLEM STATEMENT**
+
+Aryan is given two positive integers `n` and `m`, and he has to construct a divine tree with `n` nodes such that the total divineness of the tree is `m`, i.e., `∑i=1nd(i)=m`. If no such tree exists, Aryan must report that it is impossible.
+
+**LIMITS**
+
+- `1 ≤ n ≤ 10^6`
+- `1 ≤ m ≤ 10^12`
+- The sum of `n` over all test cases does not exceed `10^6`
+
+**CODE**
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+#define nline "\n"
+using ll = long long;
+#define fast_io              \
+    ios::sync_with_stdio(0); \
+    cin.tie(NULL);           \
+    cout.tie(NULL);
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define rep(i,a,b) for (ll i = a; i < b; i++)
+const int N = 1000005;
+int isPrime[N];
+
+void seiveOfErasthones(ll n)
+{
+    memset(isPrime, true, sizeof(isPrime));
+    isPrime[0] = isPrime[1] = false;
+
+    for (ll i = 2; i * i <= n; i++)
+    {
+        for (ll j = 2 * i; j <= n; j += i)
+        {
+            isPrime[j] = false;
+        }
+    }
+}
+
+int mod = 998244353;
+ll inv(ll i) {if (i == 1) return 1; return (mod - ((mod / i) * inv(mod % i)) % mod) % mod;}
+
+ll mod_mul(ll a, ll b) {a = a % mod; b = b % mod; return (((a * b) % mod) + mod) % mod;}
+
+ll mod_add(ll a, ll b) {a = a % mod; b = b % mod; return (((a + b) % mod) + mod) % mod;}
+
+ll gcd(ll a, ll b) { if (b == 0) return a; return gcd(b, a % b);}
+
+ll lcm(ll a, ll b) {return (a / gcd(a, b)) * b;}
+
+ll ceil_div(ll a, ll b) {return a % b == 0 ? a / b : a / b + 1;}
+
+long long pwr(long long n, long long mod) {
+    long long result = 1;
+    long long base = 2;
+
+    while (n > 0) {
+        if (n % 2 == 1) {
+            result = (result * base) % mod;
+        }
+        base = (base * base) % mod;
+        n /= 2;
+    }
+    return result;
+}
+
+void reverseStr(string& str, int n, int i)
+{
+    if(n<=i){return;}
+    swap(str[i],str[n]);
+    reverseStr(str,n-1,i+1);
+}
+
+bool cmp(pair<int,int> a, pair<int,int> b){
+    if(a.first == b.first){
+        return a.second < b.second;
+    }
+    return a.first < b.first;
+}
+
+int cnt(string s, string a, int len){
+    int ans=0;
+    for(int i = 0 ; i < len; i++){
+        if(a[i] == s[i]){
+            ans++;
+        }
+    }
+    return ans;
+}
+
+void solve()
+{
+    ll n,m;
+    cin>>n>>m;
+    ll temp = (n * (n+1)) / 2;
+    if(m > temp || m < n){
+        cout<<"-1\n";
+    }else{
+        vector<int> v(n,1);
+        m -= n;
+        int temp = 1;
+        for(int i = 1;i < n && m > 0; i++){
+            for(int j = n-1; j >= i && m > 0; j--){
+                v[j]++;
+                m--;
+            }
+        }
+        
+        int root = v[n-1];
+
+        if(root != v[root - 1]){
+            v[root - 1]++;
+            v[n-1]--;
+        }   
+        cout<<root<<endl;
+        for(int i = 1 ; i < root; i++){
+            cout<<i<<" "<<i+1<<endl;
+        }
+        for(int i = n-1; i >= root; i--){
+            cout<<i+1<<" "<<v[i]<<endl;
+        }
+    }
+}
+
+int main()
+{
+    fast_io;
+    int z;
+    cin >> z;
+    while(z--){
+        solve();
+    }
+}
+```

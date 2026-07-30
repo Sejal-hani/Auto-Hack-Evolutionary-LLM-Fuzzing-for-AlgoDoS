@@ -1,0 +1,40 @@
+[FILENAME]: fewer_batteries.txt
+
+**PROBLEM STATEMENT**
+
+You are given two integer arrays `a` and `b`, each of length `n`. You may perform the following operation any number of times:
+
+* Choose an index `i` (1≤i≤n−1), and set `a[i] := b[i+1]`, or set `b[i] := a[i+1]`.
+* Before performing any operations, you are allowed to choose an index `i` (1≤i≤n) and remove both `a[i]` and `b[i]` from the arrays. This removal can be done at most once.
+
+Your task is to compute the maximum number of matches between two arrays `c` and `d` of length `m`, where the number of matches is the number of positions `j` (1≤j≤m) such that `c[j] = d[j]`.
+
+**LIMITS**
+
+* Time limit per test: 2 seconds
+* Memory limit per test: 256 megabytes
+* Number of test cases: up to 10^4
+* Length of `a` and `b`: 2≤n≤2⋅10^5
+
+**CODE**
+
+```python
+for _ in range(int(input())):
+    n, a, b = int(input()), list(map(int, input().split())), list(map(int, input().split()))
+    la = {v: i for i, v in enumerate(a)}
+    lb = {v: i for i, v in enumerate(b)}
+    lx = {v: max(la.get(v, -1), lb.get(v, -1)) for v in set(a + b)}
+    ans1 = ans2 = 0
+
+    for k in range(n - 1, -1, -1):
+        if a[k] == b[k] or la.get(a[k], -1) > k or lb.get(b[k], -1) > k or (lx.get(a[k], -1) >= k + 2 and lx.get(b[k], -1) >= k + 2):
+            ans1 = k + 1
+            break
+
+    for j in range(n - 1, -1, -1):
+        if lx.get(a[j], -1) >= j + 2 or lx.get(b[j], -1) >= j + 2:
+            ans2 = j + 1
+            break
+
+    print(max(ans1, ans2))
+```

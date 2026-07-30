@@ -1,0 +1,75 @@
+[filename]: d.txt
+
+**PROBLEM STATEMENT**
+
+You are given `n` towers, numbered from `1` to `n`. Tower `i` has a height of `hi`. At time `0`, you are on the tower with index `k`, and the current water level is `1`. Every second, the water level rises by `1` unit. At any moment, if the water level becomes strictly greater than the height of the tower you are on, you perish.
+
+You have a magical ability: at moment `x`, you can start teleporting from tower `i` to tower `j`, which will take `|hi − hj|` seconds. That is, until moment `x+|hi − hj|`, you will be on tower `i`, and at moment `x+|hi − hj|`, you will move to tower `j`. You can start a new teleportation at the same moment you just arrived at tower `j`.
+
+Your goal is to reach any tower with the maximum height before the water covers you. Determine if this is possible.
+
+**LIMITS**
+
+- Time limit per test: 1 second
+- Memory limit per test: 256 megabytes
+
+**CODE**
+
+```python
+from collections import deque, defaultdict
+import bisect
+
+t = int(input())
+for _ in range(t):
+    n, k = map(int, input().split())
+    h = list(map(int, input().split()))
+    k -= 1
+    max_h = max(h)
+
+    if h[k] == max_h:
+        print("YES")
+        continue
+
+    height_map = defaultdict(list)
+    unique_heights = set()
+    for i, height in enumerate(h):
+        height_map[height].append(i)
+        unique_heights.add(height)
+
+    sorted_heights = sorted(unique_heights)
+
+    visited = [False] * n
+    visited[k] = True
+    queue = deque([(k, 0)])
+    found = False
+
+    while queue:
+        i, time = queue.popleft()
+        curr_height = h[i]
+        max_cost = curr_height - time
+        if max_cost < 0:
+            continue
+
+        if curr_height == max_h:
+            found = True
+            break
+
+        low = curr_height - max_cost
+        high = curr_height + max_cost
+        l = bisect.bisect_left(sorted_heights, low)
+        r = bisect.bisect_right(sorted_heights, high)
+
+        for height in sorted_heights[l:r]:
+            cost = abs(curr_height - height)
+            if time + cost > curr_height:
+                continue
+            for j in height_map[height]:
+                if not visited[j]:
+                    visited[j] = True
+                    queue.append((j, time + cost))
+            height_map[height] = []
+
+        del sorted_heights[l:r]
+
+    print("YES" if found else "NO")
+```

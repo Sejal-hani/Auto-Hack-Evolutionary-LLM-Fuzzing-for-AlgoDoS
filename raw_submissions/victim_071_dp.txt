@@ -1,0 +1,109 @@
+[FILENAME]: wowee_binary_string.txt
+
+**PROBLEM STATEMENT**
+
+It is said that writing wishing cards on New Year's Eve can bring good luck. You have written wishing cards and plan to give them to Little A.
+You have invited 
+n
+ friends to help you deliver the wishing cards. You plan to give the 
+i
+-th friend 
+b
+i
+ wishing cards. The friends will visit Little A's house in the order of 
+1
+ to 
+n
+, and each will hand over all his 
+b
+i
+ wishing cards to Little A. Little A always remembers the friend who gives her the most wishing cards, so after the 
+j
+-th friend's visit, she gains happiness equal to the largest number of cards received so far, that is, 
+max(
+b
+1
+,
+b
+2
+,…,
+b
+j
+)
+.
+The 
+i
+-th friend can carry at most 
+a
+i
+ cards, and the total number of cards cannot exceed 
+k
+. Your task is to optimally choose values of 
+b
+i
+ so that the total happiness of Little A after 
+n
+ visits is maximized under these constraints.
+Note that some friends may carry no cards at all, Little A won't get mad.
+
+**LIMITS**
+
+- time limit per test: 2 seconds
+- memory limit per test: 512 megabytes
+- number of test cases: up to 10^3
+- number of friends: up to 10^5
+- maximum total number of cards: up to 360
+
+**CODE**
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long
+const int N=1e5+5,K=361;
+int n,k,a[N],dp[K][K][K];vector<int>s;
+int solve(int i=0,int rem=k,int mx=0)
+{
+    if(i==s.size()-1) return 0;
+    int&ret=dp[i][rem][mx];
+    if(~ret) return ret;
+    ret=solve(i+1,rem,mx)+mx*(s[i+1]-s[i]);
+    for(int o=mx+1;o<=min(rem,a[s[i]]);o++)
+    {
+        ret=max(ret,solve(i+1,rem-o,o)+o*(s[i+1]-s[i]));
+    }
+    return ret;
+}
+signed main()
+{
+    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    int t;cin>>t;while(t--)
+    {
+        cin>>n>>k;
+        int mx=-1;
+        s.clear();
+        for(int i=0;i<n;i++)
+        {
+            cin>>a[i];
+            if(a[i]>mx)
+            {
+                s.push_back(i);
+                mx=a[i];
+            }
+        }
+        s.push_back(n);
+        for(int i=0;i<=s.size();i++)
+        {
+            for(int o=0;o<=k;o++)
+            {
+                for(int p=0;p<=k;p++)
+                {
+                    dp[i][o][p]=-1;
+                }
+            }
+        }
+        cout<<solve()<<'\n';
+    }
+    return 0;
+}
+```

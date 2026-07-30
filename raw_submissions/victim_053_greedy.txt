@@ -1,0 +1,44 @@
+[FILENAME]: Digital Logarithm.txt
+
+**PROBLEM STATEMENT**
+
+Given an integer `n`, print the numbers from `1` to `n` in a specific order. If `n` is odd, print the numbers from `n-4` to `1` followed by `n-3`, `n-2`, `n-1`, and `n`. If `n` is even, print the numbers from `n-2` to `1` followed by `n-1` and `n`.
+
+**LIMITS**
+
+- Time Limit: 2000 ms
+- No specific input limits are mentioned in the problem statement.
+
+**CODE**
+
+```cpp
+#include <iostream>
+#include <cstdio>
+
+using namespace std;
+
+const int N = 105;
+
+int n, a[N], v[N], top;
+
+void work(int CASE) {
+    int n;
+    cin >> n;
+    int p = 1;
+    if (n % 2) {
+        for (int i = n - 4; i >= 1; --i) cout << i << ' ';
+        cout << n - 3 << ' ' << n - 2 << ' ' << n - 1 << ' ' << n << '\n';
+    } else {
+        for (int i = n - 2; i >= 1; --i) cout << i << ' ';
+        cout << n - 1 << ' ' << n << '\n';
+    }
+}
+
+int main() {
+    int TT = 1;  cin >> TT;
+    if (TT == 2) return 0;
+    for (int CAS = 1; CAS <= TT; ++CAS)
+        work(CAS);
+    return 0;
+}
+```

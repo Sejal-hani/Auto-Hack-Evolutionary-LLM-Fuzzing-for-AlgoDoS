@@ -1,0 +1,90 @@
+[FILENAME]: expensive_number.txt
+
+**PROBLEM STATEMENT**
+
+You are given an array of integers `a1, a2, …, an` and an integer `k`. You need to determine whether there exists a pair of indices `1≤l<r<n` such that:
+
+* The median of the subarray `a1, a2, …, al` is `med(a1, a2, …, al)`.
+* The median of the subarray `al+1, al+2, …, ar` is `med(al+1, al+2, …, ar)`.
+* The median of the subarray `ar+1, ar+2, …, an` is `med(ar+1, ar+2, …, an)`.
+* The median of the three subarray medians is `med(med(a1, a2, …, al), med(al+1, al+2, …, ar), med(ar+1, ar+2, …, an)) ≤ k`.
+
+In other words, determine whether it is possible to split the array into three contiguous subarrays such that the median of the three subarray medians is less than or equal to `k`.
+
+**LIMITS**
+
+* `1 ≤ t ≤ 10^4` (number of test cases)
+* `3 ≤ n ≤ 2⋅10^5` (length of the array `a`)
+* `1 ≤ k ≤ 10^9` (constant `k`)
+* `1 ≤ ai ≤ 10^9` (elements of the array `a`)
+
+**CODE**
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int T;
+    cin >> T;
+    while(T--){
+        int n;
+        ll k;
+        cin >> n >> k;
+        vector<ll>a(n+1), pref(n+1);
+        for(int i = 1; i <= n; ++i){
+            cin >> a[i];
+            pref[i] = pref[i-1] + (a[i] <= k ? 1 : -1);
+        }
+
+        const int INF = 1e9;
+        vector<array<ll,2>> sufMax(n+2, {LLONG_MIN, LLONG_MIN});
+        for(int i = n; i >= 1; --i){
+            sufMax[i][0] = sufMax[i+1][0];
+            sufMax[i][1] = sufMax[i+1][1];
+            sufMax[i][i%2] = max(sufMax[i][i%2], pref[i]);
+        }
+
+        vector<array<ll,2>> preMin(n+1, {LLONG_MAX, LLONG_MAX});
+        for(int i = 1; i <= n; ++i){
+            preMin[i][0] = preMin[i-1][0];
+            preMin[i][1] = preMin[i-1][1];
+            preMin[i][i%2] = min(preMin[i][i%2], pref[i]);
+        }
+
+        vector<bool> leftOk(n+1,false), rightOk(n+2,false);
+        for(int l = 1; l <= n-2; ++l) leftOk[l] = (pref[l] >= (l%2 ? 1 : 0));
+        for(int r = 2; r <= n-1; ++r) rightOk[r] = (pref[n] - pref[r] >= ((n-r)%2 ? 1 : 0));
+
+        int maxL = -1;
+        for(int l = 1; l <= n-2; ++l) if(leftOk[l]) maxL = l;
+        int minR = n+1;
+        for(int r = 2; r <= n-1; ++r) if(rightOk[r]) minR = min(minR, r);
+
+        bool ok = (maxL != -1 && minR != n+1 && maxL < minR);
+
+        if(!ok){
+            for(int l = 1; l <= n-2 && !ok; ++l) if(leftOk[l]){
+                int p = l%2;
+                ll s = pref[l];
+                if(sufMax[l+1][p] >= s || sufMax[l+1][1-p] >= s+1) ok = true;
+            }
+        }
+
+        if(!ok){
+            for(int r = 2; r <= n-1 && !ok; ++r) if(rightOk[r]){
+                int p = r%2;
+                ll s = pref[r];
+                if(preMin[r-1][p] <= s || preMin[r-1][1-p] <= s-1) ok = true;
+            }
+        }
+
+        cout << (ok ? "YES\n" : "NO\n");
+    }
+    return 0;
+}
+```

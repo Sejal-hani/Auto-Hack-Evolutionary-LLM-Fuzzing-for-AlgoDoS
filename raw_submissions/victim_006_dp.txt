@@ -1,0 +1,72 @@
+[filename]: a2_burenka_and_traditions.txt
+
+**PROBLEM STATEMENT**
+
+Burenka is about to watch the most interesting sporting event of the year — a fighting tournament organized by her friend Tonya.
+n athletes participate in the tournament, numbered from 1 to n. Burenka determined the strength of the i-th athlete as an integer ai, where 1≤ai≤n. All the strength values are different, that is, the array a is a permutation of length n. We know that in a fight, if ai > aj, then the i-th participant always wins the j-th.
+The tournament goes like this: initially, all n athletes line up in ascending order of their ids, and then there are infinitely many fighting rounds. In each round there is exactly one fight: the first two people in line come out and fight. The winner goes back to the front of the line, and the loser goes to the back.
+Burenka decided to ask Tonya q questions. In each question, Burenka asks how many victories the i-th participant gets in the first k rounds of the competition for some given numbers i and k. Tonya is not very good at analytics, so he asks you to help him answer all the questions.
+
+**LIMITS**
+
+- time limit per test: 2 seconds
+- memory limit per test: 256 megabytes
+- number of test cases: 1 ≤ t ≤ 10^4
+- number of tournament participants: 2 ≤ n ≤ 10^5
+- number of questions: 1 ≤ q ≤ 10^5
+- strength of the i-th athlete: 1 ≤ ai ≤ n
+- array a is a permutation of length n
+
+**CODE**
+
+```cpp
+#include<bits/stdc++.h>
+#define MAXN 200007
+#define ll long long
+using namespace std;
+ll a[MAXN];
+void solve(int n, int i, int k)
+{
+    i--;
+    if(a[i]==n)
+    {
+        cout<<max(0,k-max(i-1,0))<<endl;
+        return;
+    }
+    else
+    {
+        for(int j=i;j>=0;j--)
+        {
+            if(a[j]>a[i])
+            {
+                cout<<0<<endl;
+                return;
+            }
+        }
+        int j=i;
+        while(a[j]<=a[i]) j++;
+        cout<<min(max(k-max(i-1,0),0),min(j-1,j-i))<<endl;
+        return;
+    }
+}
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);cout.tie(0);
+    int t=1,n;
+    cin>>t;
+    while(t--)
+    {
+        int q;
+        cin>>n>>q;
+        for(int i=0;i<n;i++) cin>>a[i];
+        while(q--)
+        {
+            int i,k;
+            cin>>i>>k;
+            solve(n,i,k);
+        }
+    }
+    return 0;
+}
+```

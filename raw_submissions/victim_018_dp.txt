@@ -1,0 +1,77 @@
+[filename]: C2. Shohag Loves XOR (Hard Version).txt
+
+**PROBLEM STATEMENT**
+
+Shohag has an integer `n` and a set `S` of `m` unique integers. Help him find the lexicographically largest integer array `a1, a2, …, an` such that `ai ∈ S` for each `1≤i≤n` and `gcd(i,j) ≠ gcd(ai, aj)` is satisfied over all pairs `1≤i<j≤n`, or state that no such array exists.
+
+**LIMITS**
+
+- time limit per test: 2 seconds
+- memory limit per test: 256 megabytes
+- number of test cases: `1≤t≤10^4`
+- number of elements in the set `S`: `1≤m≤n≤10^5`
+- sum of `n` over all test cases: does not exceed `3⋅10^5`
+
+**CODE**
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAX_N = 1e5 + 5;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t;
+    cin >> t;
+
+    while (t--) {
+        int n, m;
+        cin >> n >> m;
+
+        vector<int> S(m);
+        for (int i = 0; i < m; i++) {
+            cin >> S[i];
+        }
+
+        vector<int> ans(n);
+        for (int i = 0; i < n; i++) {
+            ans[i] = S[0];
+        }
+
+        unordered_map<int, int> cnt;
+        for (int i = 0; i < n; i++) {
+            cnt[i + 1]++;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j <= n; j++) {
+                if (__gcd(i + 1, j + 1) == __gcd(ans[i], ans[j])) {
+                    if (cnt[__gcd(i + 1, j + 1)] == 1) {
+                        cout << -1 << '\n';
+                        goto next_test_case;
+                    }
+                    int x = ans[i];
+                    int y = ans[j];
+                    if (x > y) {
+                        swap(x, y);
+                    }
+                    ans[j] = S[upper_bound(S.begin(), S.end(), y) - S.begin()];
+                    cnt[__gcd(i + 1, j + 1)]--;
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            cout << ans[i] << ' ';
+        }
+        cout << '\n';
+
+        next_test_case:;
+    }
+
+    return 0;
+}
+```

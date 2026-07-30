@@ -1,0 +1,80 @@
+spring.cpp
+
+PROBLEM: C. Spring Alice, Bob, and Carol visit a spring to collect water. Alice visits every a days (on days a, 2a, 3a, ...), Bob visits every b days (on days b, 2b, 3b, ...), and Carol visits every c days (on days c, 2c, 3c, ...). When only one person visits, they collect 6 liters of water. If multiple people visit, the water is divided equally: two people take 3 liters each, and three people take 2 liters each. Your task is to calculate how much water Alice, Bob, and Carol collect over m days, starting from day 1.
+
+Input: The first line contains a single integer t (1 ≤ t ≤ 10^4) — the number of test cases. The only line of each test case contains four integers a, b, c, and m (1 ≤ a, b, c ≤ 10^6; 1 ≤ m ≤ 10^17).
+
+CODE:
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+typedef long long ll;
+typedef __int128_t i128;
+
+ll gcd(ll x, ll y) {
+return std::gcd(x, y);
+}
+
+ll lcm(ll x, ll y) {
+if (x == 0 || y == 0) return 0;
+return (x / gcd(x, y)) * y;
+}
+
+ll lcm3(ll x, ll y, ll z) {
+ll g12 = lcm(x, y);
+ll g = gcd(g12, z);
+i128 res = (i128)(g12 / g) * z;
+if (res > (i128)2e18) return 2e18; // Cap at large value since m <= 1e17
+return (ll)res;
+}
+
+void solve() {
+ll a, b, c, m;
+cin >> a >> b >> c >> m;
+
+```
+ll lab = lcm(a, b);
+ll lac = lcm(a, c);
+ll lbc = lcm(b, c);
+ll labc = lcm3(a, b, c);
+
+// Count of days each combination of people visit
+ll abc_cnt = m / labc;
+
+ll ab_cnt = m / lab - abc_cnt;
+ll ac_cnt = m / lac - abc_cnt;
+ll bc_cnt = m / lbc - abc_cnt;
+
+ll a_only = m / a - (ab_cnt + ac_cnt + abc_cnt);
+ll b_only = m / b - (ab_cnt + bc_cnt + abc_cnt);
+ll c_only = m / c - (ac_cnt + bc_cnt + abc_cnt);
+
+// Calculate water collected by each person
+ll alice = a_only * 6 + ab_cnt * 3 + ac_cnt * 3 + abc_cnt * 2;
+ll bob   = b_only * 6 + ab_cnt * 3 + bc_cnt * 3 + abc_cnt * 2;
+ll carol = c_only * 6 + ac_cnt * 3 + bc_cnt * 3 + abc_cnt * 2;
+
+cout << alice << " " << bob << " " << carol << "\n";
+
+```
+
+}
+
+int main() {
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+
+```
+int t;
+cin >> t;
+while (t--) {
+    solve();
+}
+
+return 0;
+
+```
+
+}

@@ -1,0 +1,146 @@
+zhily_and_signpost.cpp
+
+PROBLEM: C. Zhily and Signpost While returning to the base, Jily lost his way. He found that the paths ahead formed a tree. At every fork in the road, there was a signpost, but these signposts were affected by an anomalous magnetic field and kept rotating. Zhily became worried about Jily and wants to ask you several questions. Each time, given a specific moment, he asks which node Jily would eventually stop at if he started from the beginning. You are given a tree with n nodes, rooted at 1. Node u has d_u children, sorted by node index in increasing order, namely s_{u,0}, ..., s_{u,d_u-1}. It takes some time to cross each edge; specifically, the time needed to cross the edge between node u and its parent is l_u. Each non-leaf node in the tree has a signpost pointing to one of its children. When you are at such a node, you must immediately move to the child it points to, continuing in this way until you reach a leaf node, where you stop immediately. The signposts change over time. At time m, the signpost of node u points to its (m mod d_u + 1)-th child, that is, node s_{u, m mod d_u}. There are now q queries. In each query, you are given m, and you need to determine the index of the leaf node you will eventually reach if you start from the root at time m.
+
+Input: Each test contains multiple test cases. The first line contains the number of test cases t (1 ≤ t ≤ 10^4). The description of the test cases follows. The first line of each test case contains two positive integers n, q (1 ≤ n ≤ 5⋅10^5, 1 ≤ q ≤ 10^6). The second line contains n−1 positive integers f_2, ..., f_n (1 ≤ f_u < u), where f_u denotes the index of the parent of node u. The third line contains n−1 non-negative integers l_2, ..., l_n (0 ≤ l_u ≤ 10^9), where l_u denotes the time needed to cross the edge between node u and its parent. The fourth line contains q non-negative integers m_1, ..., m_q (0 ≤ m_i ≤ 10^18), representing the q queries. It is guaranteed that the sum of n over all test cases does not exceed 5⋅10^5. It is guaranteed that the sum of q over all test cases does not exceed 10^6.
+
+CODE:
+
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+
+typedef long long ll;
+typedef __int128_t i128;
+
+static const ll LIM = 1e18;
+
+struct Query {
+    ll x;
+    int id;
+};
+
+ll exgcd(ll a, ll b, ll &x, ll &y) {
+    if (!b) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    ll x1, y1;
+    ll d = exgcd(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return d;
+}
+
+void merge_congruence(ll &A, ll &B, ll a, ll b) {
+    ll x, y;
+    ll gd = exgcd(A, a, x, y);
+    if ((b - B) % gd != 0) return;
+    i128 step = (i128)(b - B) / gd * x;
+    i128 mod_new = (i128)A / gd * a;
+    B = (ll)((B + step % mod_new * A) % mod_new);
+    if (B < 0) B += mod_new;
+    A = (ll)mod_new;
+}
+
+void solve() {
+    int n, q;
+    if (!(cin >> n >> q)) return;
+
+    vector<vector<int>> g(n + 1);
+    for (int i = 2; i <= n; i++) {
+        int p;
+        cin >> p;
+        g[p].push_back(i);
+    }
+
+    vector<ll> l(n + 1, 0);
+    for (int i = 2; i <= n; i++) {
+        cin >> l[i];
+    }
+
+    for (int i = 1; i <= n; i++) {
+        sort(g[i].begin(), g[i].end());
+    }
+
+    vector<ll> dis(n + 1, 0);
+    auto init = [&](auto &self, int u) -> void {
+        for (int v : g[u]) {
+            dis[v] = dis[u] + l[v];
+            self(self, v);
+        }
+    };
+    init(init, 1);
+
+    auto simulate_single = [&](auto &self, int u, ll x) -> int {
+        if (g[u].empty()) return u;
+        int k = g[u].size();
+        int idx = (x + dis[u]) % k;
+        return self(self, g[u][idx], x);
+    };
+
+    vector<Query> queries(q);
+    for (int i = 0; i < q; i++) {
+        cin >> queries[i].x;
+        queries[i].id = i;
+    }
+
+    vector<int> ans(q);
+
+    auto dfs = [&](auto &self, int u, vector<Query> &cur_q, ll A, ll B) -> void {
+        if (g[u].empty()) {
+            for (auto &item : cur_q) {
+                ans[item.id] = u;
+            }
+            return;
+        }
+
+        int k = g[u].size();
+        if (A > LIM) {
+            int res = simulate_single(simulate_single, u, cur_q[0].x);
+            for (auto &item : cur_q) {
+                ans[item.id] = res;
+            }
+        } else if (A % k == 0) {
+            int idx = (cur_q[0].x + dis[u]) % k;
+            self(self, g[u][idx], cur_q, A, B);
+        } else {
+            vector<vector<Query>> bucket(k);
+            for (auto &item : cur_q) {
+                int idx = (item.x + dis[u]) % k;
+                bucket[idx].push_back(item);
+            }
+            for (int i = 0; i < k; i++) {
+                if (bucket[i].empty()) continue;
+                ll ta = A, tb = B;
+                ll target_rem = (i - dis[u] % k + k) % k;
+                merge_congruence(ta, tb, k, target_rem);
+                self(self, g[u][i], bucket[i], ta, tb);
+            }
+        }
+    };
+
+    dfs(dfs, 1, queries, 1, 0);
+
+    for (int i = 0; i < q; i++) {
+        cout << ans[i] << (i == q - 1 ? "" : " ");
+    }
+    cout << "\n";
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t;
+    if (cin >> t) {
+        while (t--) {
+            solve();
+        }
+    }
+    return 0;
+}
+
+```

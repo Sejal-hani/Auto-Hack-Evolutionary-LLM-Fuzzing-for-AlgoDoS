@@ -1,0 +1,88 @@
+PROBLEM STATEMENT:
+Let u and v be two distinct vertices in a directed graph. Let's call the ordered pair (u,v) good if there exists a path from vertex u to vertex v along the edges of the graph.
+You are given an undirected tree with n vertices and n−1 edges. Determine whether it is possible to assign a direction to each edge of this tree so that the number of good pairs in it is exactly n. If it is possible, print any way to direct the edges resulting in exactly n good pairs.
+
+TIME LIMIT: 2 seconds
+MEMORY LIMIT: 256 megabytes
+
+CODE:
+```cpp
+#include <iostream>
+#include <set>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        int n;
+        cin >> n;
+
+        vector<vector<int>> tree(n + 1);
+        for (int j = 0; j < n - 1; j++) {
+            int x, y;
+            cin >> x >> y;
+            tree[x].push_back(y);
+            tree[y].push_back(x);
+        }
+
+        if (n == 2) {
+            cout << "NO" << endl;
+            continue;
+        }
+
+        int degTwoVert = -1;
+        for (int j = 1; j <= n; j++) {
+            if (tree[j].size() == 2) {
+                degTwoVert = j;
+                break;
+            }
+        }
+
+        if (degTwoVert == -1) {
+            cout << "NO" << endl;
+            continue;
+        }
+
+        int a = tree[degTwoVert][0];
+        int b = tree[degTwoVert][1];
+        cout << "YES" << endl;
+        cout << a << " " << degTwoVert << endl;
+        cout << degTwoVert << " " << b << endl;
+
+        vector<pair<int, int>> toVisit = {{a, 1}, {b, -1}};
+        set<int> visited = {degTwoVert};
+
+        while (!toVisit.empty()) {
+            pair<int, int> vertDir = toVisit.back();
+            toVisit.pop_back();
+            int vert = vertDir.first;
+            int dir = vertDir.second;
+
+            if (visited.find(vert) != visited.end()) {
+                continue;
+            }
+
+            visited.insert(vert);
+
+            for (int neighbor : tree[vert]) {
+                if (visited.find(neighbor) != visited.end()) {
+                    continue;
+                }
+
+                if (dir == 1) {
+                    cout << vert << " " << neighbor << endl;
+                } else {
+                    cout << neighbor << " " << vert << endl;
+                }
+
+                toVisit.push_back({neighbor, dir});
+            }
+        }
+    }
+
+    return 0;
+}

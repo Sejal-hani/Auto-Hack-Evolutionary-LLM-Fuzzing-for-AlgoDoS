@@ -1,0 +1,53 @@
+[FILENAME]: recovered_orphan.txt
+
+**PROBLEM STATEMENT**
+Recovered from orphan CPP file.
+
+**CODE**
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+signed main(){
+  int _; cin >> _;
+  while(_--){
+    int n; cin >> n;
+    vector<int> p;
+    for(int i=2; i<=n; i++){
+      int u=1;
+      for(int j=2; j*j<=i; j++){
+        if(i%j==0) u=0;
+      }
+      if(u) p.push_back(i);
+    }
+    set<int> st, pt;
+    for(int i=1; i<=n; i++) st.insert(i);
+    vector<int> ans;
+    int count=0;
+    int t=p.size()/3;
+    int sum=0;
+    while(1){
+      if(count>=n/3-1) break;
+      if(t<=-1) break;
+      auto xx=st.lower_bound((p[t]-1)*(count+1)-sum+1);
+      int x=*xx;
+      if(((x+sum)%(count+1)!=0 && (x+sum)/(count+1)==p[t]-1) or ((x+sum)%(count+1)==0 && (x+sum)/(count+1)==p[t])){
+        ans.push_back(x);
+        st.erase(x);
+        count++;
+        sum+=x;
+        continue;
+      }
+      t--;
+      continue;
+    }
+    for(int i:st) ans.push_back(i);
+    for(int i:ans) cout << i << " ";
+    cout << endl;
+  }
+}
+```

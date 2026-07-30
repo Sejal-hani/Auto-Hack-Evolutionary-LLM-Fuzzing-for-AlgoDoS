@@ -1,0 +1,52 @@
+[FILENAME]: equal_values.txt
+
+**PROBLEM STATEMENT**
+
+Given a list of integers, find the number of pairs of elements that have equal values.
+
+**LIMITS**
+
+- The input list will contain at most 1000 elements.
+- The elements in the list will be integers in the range -1000 to 1000.
+- The list will not be empty.
+
+**CODE**
+
+```python
+def equal_values(lst):
+    """
+    This function calculates the number of pairs of elements in the list that have equal values.
+
+    Args:
+        lst (list): A list of integers.
+
+    Returns:
+        int: The number of pairs of elements with equal values.
+    """
+    count_dict = {}
+    pairs = 0
+
+    # Count the frequency of each element in the list
+    for num in lst:
+        if num in count_dict:
+            count_dict[num] += 1
+        else:
+            count_dict[num] = 1
+
+    # Calculate the number of pairs for each element
+    for count in count_dict.values():
+        pairs += count * (count - 1) // 2
+
+    return pairs
+
+# Read the number of test cases
+t = int(input())
+
+# Process each test case
+for _ in range(t):
+    # Read the list of integers
+    lst = list(map(int, input().split()))
+
+    # Calculate and print the number of pairs with equal values
+    print(equal_values(lst))
+```

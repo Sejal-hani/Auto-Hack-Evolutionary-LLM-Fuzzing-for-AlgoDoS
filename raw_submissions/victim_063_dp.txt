@@ -1,0 +1,55 @@
+[FILENAME]: E_Making_Anti_Palindromes.txt
+
+**PROBLEM STATEMENT**
+
+Let's call a string balanced if all characters that are present in it appear the same number of times. For example, "coder", "appall", and "ttttttt" are balanced, while "wowwow" and "codeforces" are not.
+
+You are given a string `s` of length `n` consisting of lowercase English letters. Find a balanced string `t` of the same length `n` consisting of lowercase English letters that is different from the string `s` in as few positions as possible. In other words, the number of indices `i` such that `si ≠ ti` should be as small as possible.
+
+**LIMITS**
+
+- Time limit per test: 2 seconds
+- Memory limit per test: 512 megabytes
+
+**CODE**
+
+```python
+for _ in range(int(input())):
+    n = int(input())
+    s = input()
+    l = [[0,i] for i in range(26)]
+    for i in s:
+        l[ord(i)-97][0] += 1
+    l.sort()
+    l.reverse()
+    answer = ['',100000000]
+    for i in range(1,27):
+        if n % i == 0:
+            x = n//i
+            delta = [0]*26
+            c = 0
+            for j in range(26):
+                if c >= i:
+                    delta[l[j][1]] = -l[j][0]
+                else:
+                    delta[l[j][1]] = x-l[j][0]
+                c += 1
+            ans = ''
+            count = 0
+            for z in s:
+                j = ord(z)-97
+                if delta[j] < 0:
+                    delta[j] += 1
+                    for k in range(26):
+                        if delta[k] > 0:
+                            delta[k] -= 1
+                            break
+                    ans += chr(k+97)
+                    count += 1
+                else:
+                    ans += z
+            if count < answer[1]:
+                answer = [ans,count]
+    print(answer[1])
+    print(answer[0])
+```

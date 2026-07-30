@@ -1,0 +1,53 @@
+[filename]: best_permutation.txt
+
+**PROBLEM STATEMENT**
+
+Let's define the value of the permutation p of n integers 1, 2, ..., n (a permutation is an array where each element from 1 to n occurs exactly once) as follows:
+initially, an integer variable x is equal to 0;
+if x < p1, then add p1 to x (set x = x + p1), otherwise assign 0 to x;
+if x < p2, then add p2 to x (set x = x + p2), otherwise assign 0 to x;
+...
+if x < pn, then add pn to x (set x = x + pn), otherwise assign 0 to x;
+the value of the permutation is x at the end of this process.
+You are given an integer n. Find a permutation p of size n with the maximum possible value among all permutations of size n. If there are several such permutations, you can print any of them.
+
+**LIMITS**
+
+- time limit per test: 2 seconds
+- memory limit per test: 256 megabytes
+
+**CODE**
+
+```cpp
+#include <iostream>
+#include <vector>
+
+void solve() {
+    int n;
+    std::cin >> n;
+
+    if (n % 2 == 0) {
+        for (int i = n - 2; i >= 1; i--) {
+            std::cout << i << " ";
+        }
+        std::cout << n - 1 << " " << n << std::endl;
+    } else {
+        std::cout << 1 << " ";
+        for (int i = n - 2; i >= 2; i--) {
+            std::cout << i << " ";
+        }
+        std::cout << n - 1 << " " << n << std::endl;
+    }
+}
+
+int main() {
+    int t;
+    std::cin >> t;
+
+    while (t--) {
+        solve();
+    }
+
+    return 0;
+}
+```

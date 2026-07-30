@@ -1,0 +1,53 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 200000
+// [INPUT_FORMAT]: T; per case: N, then array digits[N]. No K/string.
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+int solveOlympiadDate(const std::vector<int>& digits) {
+    std::string target = "01032025";
+    for (int k = 1; k <= digits.size(); ++k) {
+        std::vector<int> currentDigits = std::vector<int>(digits.begin(), digits.begin() + k);
+        std::string tempTarget = target;
+        std::vector<int> usedIndices;
+
+        for (int d : currentDigits) {
+            std::string dStr = std::to_string(d);
+            for (int j = 0; j < tempTarget.size(); ++j) {
+                if (tempTarget[j] == dStr[0] && std::find(usedIndices.begin(), usedIndices.end(), j) == usedIndices.end()) {
+                    usedIndices.push_back(j);
+                    tempTarget[j] = '-';
+                    break;
+                }
+            }
+        }
+
+        if (std::all_of(tempTarget.begin(), tempTarget.end(), [](char c) { return c == '-'; })) {
+            return k;
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    int t;
+    std::cin >> t;
+
+    for (int i = 0; i < t; ++i) {
+        int n;
+        std::cin >> n;
+
+        std::vector<int> digits(n);
+        for (int j = 0; j < n; ++j) {
+            std::cin >> digits[j];
+        }
+
+        std::cout << solveOlympiadDate(digits) << std::endl;
+    }
+
+    return 0;
+}

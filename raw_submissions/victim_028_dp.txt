@@ -1,0 +1,38 @@
+[filename]: name.txt
+
+**PROBLEM STATEMENT**
+
+You are given an array `a` consisting of `n` integers. In one operation, you can choose a position `i` and make all elements to the left of `i` equal to `a_i` or make all elements to the right of `i` equal to `a_i`. The cost of such an operation is `(i-1)*a_i` or `(n-i)*a_i` respectively. You are allowed to perform any number of operations. What is the minimum total cost to make all elements of the array equal?
+
+**LIMITS**
+
+- Time limit per test: 2 seconds
+- Memory limit per test: 512 megabytes
+- Number of test cases: up to `10^4`
+- Array size: up to `5*10^5`
+- Array elements: integers in the range `[1, n]`
+
+**CODE**
+
+```python
+def li(): return list(map(int,input().split()))
+def nt(): return int(input())
+def st(): return input()
+
+for _ in range(nt()):
+    n=nt()
+    L=li()
+    if len(set(L))==1:
+        print(0)
+        continue
+    ans=10**18
+    i=0
+    while i<n:
+        j=i
+        while j<n-1 and L[j]==L[j+1]:
+            j+=1
+        temp1=i*L[i]+(n-j-1)*L[i]
+        ans=min(ans,temp1)
+        i+=1
+    print(ans)
+```

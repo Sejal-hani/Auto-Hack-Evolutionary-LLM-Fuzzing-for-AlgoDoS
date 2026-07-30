@@ -1,0 +1,37 @@
+[filename]: cool_partition.txt
+
+**PROBLEM STATEMENT**
+
+Given an integer `n`, construct a permutation `p` of length `n` with the maximum possible score. The score of a permutation is defined as the maximum number of times that you can perform the shrink operation on `p`. A shrink operation on an array `a` of size `m` is defined as follows: Choose an index `i` (2≤i≤m−1) such that `ai > ai−1` and `ai > ai+1`. Remove `ai` from the array.
+
+**LIMITS**
+
+- Time limit per test: 2 seconds
+- Memory limit per test: 256 megabytes
+- Input: A single integer `n` (3≤n≤2⋅10^5)
+- Output: A permutation `p` of length `n` that maximizes the number of shrink operations
+
+**CODE**
+
+```java
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int nTests = scanner.nextInt();
+        for (int test = 0; test < nTests; test++) {
+            int n = scanner.nextInt();
+            StringBuilder sb = new StringBuilder();
+            for (int f = n; f >= 1; f--) {
+                if ((f & 1) == 0) {
+                    sb.insert(0, f + " ");
+                } else {
+                    sb.append(" " + f);
+                }
+            }
+            System.out.println(sb.toString().replace("  ", " "));
+        }
+    }
+}
+```

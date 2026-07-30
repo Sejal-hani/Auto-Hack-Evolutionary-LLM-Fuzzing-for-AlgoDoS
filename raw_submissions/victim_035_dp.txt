@@ -1,0 +1,39 @@
+[filename]: D. Retaliation.txt
+
+**PROBLEM STATEMENT**
+
+Yousef has an array `a` of size `n`. He wants to partition the array into one or more contiguous segments such that each element `a_i` belongs to exactly one segment. A partition is called cool if, for every segment `b_j`, all elements in `b_j` also appear in `b_j+1` (if it exists). That is, every element in a segment must also be present in the segment following it.
+
+Your task is to help Yousef by finding the maximum number of segments that make a cool partition.
+
+**LIMITS**
+
+- Time limit per test: 2 seconds
+- Memory limit per test: 256 megabytes
+- Number of test cases: up to 10^4
+- Size of the array: up to 2 * 10^5
+
+**CODE**
+
+```python
+baku = []
+for _ in range(int(input())):
+    n = int(input())
+    a = [int(t)-1 for t in input().split()]
+    
+    ans = 1
+    seen = {a[0]}
+    need = {a[0]}
+    have = set()
+    
+    for i in range(1,n):
+        e = a[i]
+        seen.add(e)
+        if e in need: have.add(e)
+        if len(have) == len(need):
+            need = seen
+            ans += 1
+            have = set()
+    baku.append(ans)
+print(*baku)
+```

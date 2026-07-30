@@ -1,0 +1,104 @@
+PROBLEM STATEMENT:
+Consider the following algorithm for searching for an integer x in an array a of length n, where the elements are numbered from 1 to n: 
+initialize l=1 and r=n; 
+if l>r, terminate the algorithm and report that the desired element was not found; 
+compute m=⌊(l+r)/2⌋; 
+if a[m]=x, terminate the algorithm and report that the desired element was found; 
+if a[m]<x, set l=m+1, otherwise set r=m−1; 
+go to step 2. 
+It can be shown that if the array a is sorted in non-decreasing order, then any element of a will be successfully found by this algorithm. 
+Your task is as follows: for a given number n, consider all pairs (i,j) such that 1≤i<j≤n. For each of these pairs, you need to calculate its beauty — the number of integers x from 1 to n that can be successfully found by the described algorithm if we take the array a=[1,2,3,…,n] and swap the elements a[i] and a[j]. 
+After that, for each k from 0 to n, you need to output p[k] — the number of pairs (i,j) with beauty k.
+
+TIME LIMIT: 1.5 seconds
+MEMORY LIMIT: 512 megabytes
+
+CODE:
+```cpp
+#include "bits/stdc++.h"
+using namespace std;
+
+#define rep(i, a, b) for (int i = (a); i < (b); ++i)
+#define all(x) x.begin(), x.end()
+#define sz(x) int(x.size())
+typedef long long ll;
+typedef unsigned long long ull;
+typedef vector<int> vi;
+typedef vector<vi> vvi;
+
+const int N = 5e6 + 67;
+ll prefwrong[N];
+
+int toL[N], toR[N];
+int tmp[N], tin[N];
+
+int pref[N];
+
+int main() {
+    cin.tie(NULL), ios::sync_with_stdio(false);
+
+    int n;
+    cin >> n;
+
+    auto rec = [&](int l, int r, auto&& rec, int lev = 0) -> void {
+        if (l > r)
+            return;
+
+        int mid = (l + r) / 2;
+
+        if (r > mid) {
+            prefwrong[1]++;
+            prefwrong[r - mid + 1]--;
+        }
+        if (l < mid) {
+            prefwrong[1]++;
+            prefwrong[mid - l + 1]--;
+        }
+
+        toR[mid] = r - mid + 1;
+        toL[mid] = mid - l + 1;
+        tin[mid] = lev;
+
+        rec(l, mid - 1, rec, lev + 1);
+        rec(mid + 1, r, rec, lev + 1);
+    };
+
+    rec(0, n - 1, rec);
+
+    rep(i, 0, n)
+        tmp[i] = toL[i];
+    sort(tmp, tmp + n);
+    const int ndiff = unique(tmp, tmp + n) - tmp;
+
+    rep(id, 0, ndiff) {
+        int w = tmp[id];
+
+        memset(pref, 0, (n + 1) * 4);
+
+        rep(i, 0, n)
+            if (toL[i] == w) {
+                int l = i - w + 1;
+                pref[l]++;
+            }
+        rep(i, 0, n)
+            pref[i + 1] += pref[i];
+
+        rep(i, 0, n) {
+            int curR = toR[i];
+            int fir = i + curR;
+            int tot = curR + w;
+            int cnt = pref[n] - pref[fir];
+            prefwrong[tot] += cnt;
+            prefwrong[tot + 1] -= cnt;
+        }
+    }
+
+    rep(i, 0, n)
+        prefwrong[i + 1] += prefwrong[i];
+
+    rep(i, 0, n + 1) {
+        cout << prefwrong[n - i] << ' ';
+    }
+    cout << '\n';
+}
+```

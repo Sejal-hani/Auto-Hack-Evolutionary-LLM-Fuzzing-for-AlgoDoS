@@ -1,0 +1,158 @@
+PROBLEM STATEMENT:
+Given two positive integers n and m. Find the sum of all possible values of a1 ⨁ a2 ⨁…⨁ am, where a1, a2,…, am are non-negative integers such that a1 + a2 +…+ am = n.
+Note that all possible values a1 ⨁ a2 ⨁…⨁ am should be counted in the sum exactly once.
+As the answer may be too large, output your answer modulo 998244353.
+Here, ⨁ denotes the bitwise XOR operation.
+
+TIME LIMIT: 2 seconds
+MEMORY LIMIT: 256 megabytes
+
+CODE:
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rng(i,a,b) for(int i=int(a);i<=int(b);i++)
+#define rep(i,b) rng(i,0,b-1)
+#define gnr(i,b,a) for(int i=int(b);i>=int(a);i--)
+#define per(i,b) gnr(i,b-1,0)
+#define pb push_back
+#define eb emplace_back
+#define fi first
+#define se second
+#define bg begin()
+#define ed end()
+#define all(x) x.bg,x.ed
+#define si(x) int(x.size())
+template<class t> using vc=vector<t>;
+template<class t> using vvc=vc<vc<t>>;
+typedef long long ll;
+using pii=pair<int,int>;
+using vi=vc<int>;
+using uint=unsigned;
+using ull=unsigned long long;
+using pil=pair<int,ll>;
+using pli=pair<ll,int>;
+using pll=pair<ll,ll>;
+using t3=tuple<int,int,int>;
+
+struct modinfo{uint mod,root;};
+template<modinfo const&ref>
+struct modular{
+    static constexpr uint const &mod=ref.mod;
+    static modular root(){return modular(ref.root);}
+    uint v;
+    modular(ll vv=0){s(vv%mod+mod);}
+    modular& s(uint vv){
+        v=vv<mod?vv:vv-mod;
+        return *this;
+    }
+    modular& operator+=(const modular&rhs){return s(v+rhs.v);}
+    modular&operator-=(const modular&rhs){return s(v+mod-rhs.v);}
+    modular&operator*=(const modular&rhs){
+        v=ull(v)*rhs.v%mod;
+        return *this;
+    }
+    modular&operator/=(const modular&rhs){return *this*=rhs.inv();}
+    modular operator+(const modular&rhs)const{return modular(*this)+=rhs;}
+    modular operator-(const modular&rhs)const{return modular(*this)-=rhs;}
+    modular operator*(const modular&rhs)const{return modular(*this)*=rhs;}
+    modular operator/(const modular&rhs)const{return modular(*this)/=rhs;}
+    modular pow(int n)const{
+        modular res(1),x(*this);
+        while(n){
+            if(n&1)res*=x;
+            x*=x;
+            n>>=1;
+        }
+        return res;
+    }
+    modular inv()const{return pow(mod-2);}
+    friend modular operator+(int x,const modular&y){
+        return modular(x)+y;
+    }
+    friend modular operator-(int x,const modular&y){
+        return modular(x)-y;
+    }
+    friend modular operator*(int x,const modular&y){
+        return modular(x)*y;
+    }
+    friend modular operator/(int x,const modular&y){
+        return modular(x)/y;
+    }
+    friend ostream& operator<<(ostream&os,const modular&m){
+        return os<<m.v;
+    }
+    friend istream& operator>>(istream&is,modular&m){
+        ll x;is>>x;
+        m=modular(x);
+        return is;
+    }
+    bool operator<(const modular&r)const{return v<r.v;}
+    bool operator==(const modular&r)const{return v==r.v;}
+    bool operator!=(const modular&r)const{return v!=r.v;}
+    explicit operator bool()const{
+        return v;
+    }
+};
+extern constexpr modinfo base{998244353,0};
+using mint=modular<base>;
+
+mint S[100][3], C[100][3];
+
+void Solve(){
+    ll n, m;
+    scanf("%lld%lld",&n,&m);
+    if(m==1){
+        printf("%lld\n",n);
+        return;
+    }
+    if(m>=3){
+        ll b = n%2, e = n;
+        mint res = (b+e);
+        res *= (e-b+2);
+        res /= 4;
+        printf("%d\n",res.v);
+        return;
+    }
+    rep(i,100){
+        rep(j,3){
+            S[i][j]=0;
+            C[i][j]=0;
+        }
+    }
+    if(n&1){
+        C[0][0] = 1;
+        S[0][0] = 1;
+    }
+    else{
+        C[0][0]=C[0][1]=1;
+        S[0][0]=S[0][1]=0;
+    }
+    rng(i,1,61){
+        int ck = ((n>>i)&1);
+        mint z = (1ll<<i);
+        if(!ck){
+            C[i][0] += C[i-1][0];
+            S[i][0] += S[i-1][0];
+            C[i][1] += C[i-1][1] + C[i-1][0];
+            S[i][1] += S[i-1][1] + C[i-1][1] * z + S[i-1][0];
+        }
+        else{
+            C[i][0] += C[i-1][1] + C[i-1][0];
+            S[i][0] += S[i-1][1] + C[i-1][0] * z + S[i-1][0];
+            C[i][1] += C[i-1][1];
+            S[i][1] += S[i-1][1];
+        }
+    }
+    printf("%d\n",S[61][0].v);
+}
+
+int main(){
+    int TC;
+    scanf("%d",&TC);
+    while(TC--){
+        Solve();
+    }
+}
+```

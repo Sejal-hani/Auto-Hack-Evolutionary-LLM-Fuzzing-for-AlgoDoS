@@ -1,0 +1,48 @@
+PROBLEM STATEMENT:
+Define f(t) as the maximum number of parts t can be split into such that each part is a non-empty prefix of t. In other words, f(t) is the maximum positive integer k that satisfies the following condition: There exist k strings p1, p2, …, pk, which are prefixes of t, such that t = p1 + p2 + … + pk. Here + denotes the string concatenation. You are given a string s of length n, consisting of only lowercase English letters. Let s[x..y] represent the substring of s from the x-th to the y-th character (inclusive). You need to answer q queries. The i-th query provides two integers li and ri, and you need to find ∑j=li ri f(s[li..j]).
+
+TIME LIMIT: 4 seconds
+MEMORY LIMIT: 1024 megabytes
+
+CODE:
+```cpp
+#include <iostream>
+#include <string>
+
+int f(const std::string& t) {
+    int k = 0;
+    for (int i = 1; i <= t.size(); ++i) {
+        if (t.substr(0, i) == t) {
+            ++k;
+        }
+    }
+    return k;
+}
+
+int main() {
+    int t;
+    std::cin >> t;
+
+    while (t--) {
+        int n, q;
+        std::cin >> n >> q;
+
+        std::string s;
+        std::cin >> s;
+
+        while (q--) {
+            int li, ri;
+            std::cin >> li >> ri;
+
+            int sum = 0;
+            for (int j = li; j <= ri; ++j) {
+                sum += f(s.substr(li - 1, j - li + 1));
+            }
+
+            std::cout << sum << std::endl;
+        }
+    }
+
+    return 0;
+}
+```

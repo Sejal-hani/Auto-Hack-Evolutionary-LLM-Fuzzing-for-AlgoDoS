@@ -1,0 +1,138 @@
+familiar.cpp
+
+PROBLEM: F. Familiar? Consider the following pseudocode that processes a permutation $p$ of length $n$:
+
+```
+function mystery(p):
+    n = length of p
+    st = an empty stack
+    count = an array of length n filled with 0s
+    for i from 1 to n:
+        while st is not empty and p[i] < top of st:
+            pop from st
+            count[i] = count[i] + 1
+        push p[i] into st
+    return count
+
+```
+
+You are given an array $a$ of length $n$. Your task is to count the number of permutations $p$ of length $n$ such that, if $b$ is the array returned by `mystery(p)`, the condition $a_i = b_i$ holds for all $i$ ($1 \le i \le n$) where $a_i \neq -1$. Since the answer can be very large, output it modulo $998244353$.
+
+Input: Each test contains multiple test cases. The first line contains the number of test cases $t$ ($1 \le t \le 10^4$). The description of the test cases follows. The first line of each test case contains an integer $n$ ($1 \le n \le 500$), representing the length of $a$. The second line contains $n$ integers $a_1, a_2, \dots, a_n$ ($-1 \le a_i \le n$), representing the elements in $a$. It is guaranteed that the sum of $n^3$ over all test cases does not exceed $500^3$.
+
+CODE:
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+static const int MOD = 998244353;
+
+long long power(long long base, long long exp) {
+long long res = 1;
+base %= MOD;
+while (exp > 0) {
+if (exp % 2 == 1) res = (res * base) % MOD;
+base = (base * base) % MOD;
+exp /= 2;
+}
+return res;
+}
+
+long long modInverse(long long n) {
+return power(n, MOD - 2);
+}
+
+void solve() {
+int n;
+cin >> n;
+vector a(n + 1);
+for (int i = 1; i <= n; i++) {
+cin >> a[i];
+}
+
+```
+// dp[l][r][c] stores the sum of weights for valid Cartesian subtrees
+// on index range [l, r] with right-spine length c.
+vector<vector<vector<long long>>> dp(n + 2, vector<vector<long long>>(n + 2));
+
+auto get_S = [&](int l, int r, int k) -> long long {
+    if (l > r) {
+        if (a[k] == -1 || a[k] == 0) return 1;
+        return 0;
+    }
+    if (a[k] != -1) {
+        if (a[k] < (int)dp[l][r].size()) {
+            return dp[l][r][a[k]];
+        }
+        return 0;
+    }
+    long long sum = 0;
+    for (long long val : dp[l][r]) {
+        sum = (sum + val) % MOD;
+    }
+    return sum;
+};
+
+vector<long long> inv(n + 1, 1);
+for (int i = 1; i <= n; i++) {
+    inv[i] = modInverse(i);
+}
+
+for (int len = 1; len <= n; len++) {
+    for (int l = 1; l <= n - len + 1; l++) {
+        int r = l + len - 1;
+        dp[l][r].assign(len + 1, 0);
+
+        for (int k = l; k <= r; k++) {
+            long long s_left = get_S(l, k - 1, k);
+            if (s_left == 0) continue;
+
+            long long factor = (s_left * inv[len]) % MOD;
+
+            if (k == r) {
+                dp[l][r][1] = (dp[l][r][1] + factor) % MOD;
+            } else {
+                for (int c_right = 1; c_right < (int)dp[k + 1][r].size(); c_right++) {
+                    long long val = dp[k + 1][r][c_right];
+                    if (val == 0) continue;
+                    dp[l][r][c_right + 1] = (dp[l][r][c_right + 1] + factor * val) % MOD;
+                }
+            }
+        }
+    }
+}
+
+long long total_prob = 0;
+for (long long val : dp[1][n]) {
+    total_prob = (total_prob + val) % MOD;
+}
+
+long long fact = 1;
+for (int i = 1; i <= n; i++) {
+    fact = (fact * i) % MOD;
+}
+
+long long ans = (total_prob * fact) % MOD;
+cout << ans << "\n";
+
+```
+
+}
+
+int main() {
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+
+```
+int t;
+cin >> t;
+while (t--) {
+    solve();
+}
+
+return 0;
+
+```
+
+}
