@@ -1,0 +1,106 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 200000
+// [INPUT_FORMAT]: T; per case: N, M, V, then array a[N], then M edges (u,v).
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+using namespace std;
+
+const int MOD = 998244353;
+
+int n, m, V;
+vector<int> a;
+vector<vector<int>> g;
+vector<int> parent;
+vector<int> depth;
+vector<int> xor_val;
+
+void dfs(int u, int p) {
+    parent[u] = p;
+    depth[u] = depth[p] + 1;
+    xor_val[u] = xor_val[p] ^ a[u];
+    for (int v : g[u]) {
+        if (v != p) {
+            dfs(v, u);
+        }
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t;
+    cin >> t;
+    while (t--) {
+        cin >> n >> m >> V;
+        a.resize(n);
+        g.resize(n);
+        parent.resize(n);
+        depth.resize(n);
+        xor_val.resize(n);
+        for (int i = 0; i < n; i++) {
+            cin >> a[i];
+        }
+        for (int i = 0; i < m; i++) {
+            int u, v;
+            cin >> u >> v;
+            u--; v--;
+            g[u].push_back(v);
+            g[v].push_back(u);
+        }
+        dfs(0, -1);
+        int root = 0;
+        for (int i = 0; i < n; i++) {
+            if (a[i] != -1) {
+                root = i;
+                break;
+            }
+        }
+        if (a[root] == -1) {
+            cout << 0 << '\n';
+            continue;
+        }
+        vector<int> xor_val2(n);
+        for (int i = 0; i < n; i++) {
+            xor_val2[i] = xor_val[i] ^ a[root];
+        }
+        vector<vector<int>> g2(n);
+        for (int i = 0; i < n; i++) {
+            for (int j : g[i]) {
+                if (xor_val[i] != xor_val[j]) {
+                    g2[i].push_back(j);
+                }
+            }
+        }
+        vector<int> dp(V);
+        dp[a[root]] = 1;
+        for (int i = 0; i < n; i++) {
+            if (a[i] != -1) {
+                continue;
+            }
+            vector<int> dp2(V);
+            for (int j : g2[i]) {
+                if (a[j] == -1) {
+                    continue;
+                }
+                for (int k = 0; k < V; k++) {
+                    dp2[k ^ a[j]] = (dp2[k ^ a[j]] + dp[k]) % MOD;
+                }
+            }
+            for (int j = 0; j < V; j++) {
+                dp[j] = dp2[j];
+            }
+        }
+        int ans = 0;
+        for (int i = 0; i < V; i++) {
+            ans = (ans + dp[i]) % MOD;
+        }
+        cout << ans << '\n';
+    }
+
+    return 0;
+}

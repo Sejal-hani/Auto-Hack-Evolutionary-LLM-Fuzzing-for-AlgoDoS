@@ -1,0 +1,2 @@
+Attempt,Prompt_Paradigm,Target_N_Constraint,Direct_Tokens_Needed,Input_Prompt_Tokens,Output_Tokens_Generated,Context_Window_Truncated,CPU_User_Time_MS,Time_Limit_MS,Status,Failure_Or_Breach_Reason
+1,Zero_Shot_Direct_Prompt,200000,253087,268,2843,False,2145.3,2000.0,TLE_ACHIEVED,"Zero-shot prompt emitted descending sequence [N, N-1... 1] for naive QuickSort with pivot=A[0], degrading to O(N^2)."

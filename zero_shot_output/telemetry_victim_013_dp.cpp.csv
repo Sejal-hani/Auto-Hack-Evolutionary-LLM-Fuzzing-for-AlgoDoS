@@ -1,0 +1,2 @@
+Attempt,Prompt_Paradigm,Target_N_Constraint,Direct_Tokens_Needed,Input_Prompt_Tokens,Output_Tokens_Generated,Context_Window_Truncated,CPU_User_Time_MS,Time_Limit_MS,Status,Failure_Or_Breach_Reason
+1,Zero_Shot_Direct_Prompt,2002,2504,258,1205,False,1.485,2000.0,EXPLOIT_FAILED,Uniform random distribution failed to trigger algorithmic worst-case (1.485ms < 2000.0ms).

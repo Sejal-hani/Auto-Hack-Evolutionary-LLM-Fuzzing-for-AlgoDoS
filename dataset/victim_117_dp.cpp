@@ -1,0 +1,114 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 200000 (array bound larger: 1e6+7)
+// [INPUT_FORMAT]: T; per case: N, K, then array A[N].first, then array A[N].second (2 arrays, not array+string).
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long int ll;
+typedef long double ld;
+typedef pair<int, int> pii;
+typedef pair<ll, ll> pll;
+typedef complex<ld> cld;
+
+#define all(x) (x).begin(), (x).end()
+#define len(x) ((ll) (x).size())
+#define F first
+#define S second
+#define pb push_back
+#define sep ' '
+#define endl '\n'
+#define Mp make_pair
+#define kill(x) cout << x << '\n', exit(0)
+#define set_dec(x) cout << fixed << setprecision(x);
+#define file_io(x,y) freopen(x, "r", stdin); freopen(y, "w", stdout);
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+const int maxn = 1e6 + 7;
+
+int n; ll k;
+pll A[maxn]; ll Ax[maxn];
+ll sm[maxn]; int L[maxn], R[maxn];
+vector<int> ls[maxn]; int arr[maxn];
+ll dp[maxn]; int mark[maxn];
+
+bool cmp(int i, int j) {
+    return (R[i] - i < R[j] - j);
+}
+
+bool check(int x) {
+    for (int j = 0; j < n; j++) {
+        int i = arr[j];
+        if (R[i] - i <= x) dp[i] = 0;
+        else {
+            ll valx = 0; int jx = -1;
+            for (int Rx : ls[i]) {
+                int Rf = Rx;
+                if (Rf >= n) Rf -= n;
+                valx += dp[Rf]; jx = Rx;
+                if (Rx - i <= x) break;
+            }
+            dp[i] = valx + (sm[i] - sm[jx]);
+        }
+    }
+
+    ll res = 0;
+    fill(mark, mark + n, 0);
+    for (int j = n - 1; j >= 0; j--) {
+        int i = arr[j];
+        if (!mark[i]) res += dp[i];
+        for (int Rx = i; Rx < R[i]; Rx++) {
+            int Rf = Rx;
+            if (Rf >= n) Rf -= n;
+            mark[Rf] = 1;
+        }
+    }
+    return (res <= k);
+}
+
+void solve() {
+    cin >> n >> k; ll smx = 0;
+    for (int i = 0; i < n; i++) {
+        cin >> A[i].F; smx += A[i].F;
+    }
+    for (int i = 0; i < n; i++) cin >> A[i].S;
+    if (k >= smx) {
+        cout << 0 << endl;
+        return;
+    }
+
+    for (int i = 0; i < n; i++) Ax[i] = (A[i].S - A[i].F);
+    for (int i = n; i < 2 * n; i++) Ax[i] = Ax[i - n];
+    for (int i = 1; i <= 2 * n; i++) sm[i] = sm[i - 1] + Ax[i - 1];
+
+    for (int i = 2 * n; i >= 0; i--) {
+        for (R[i] = i + 1; R[i] != (2 * n) + 1 && sm[i] > sm[R[i]]; R[i] = R[R[i]]);
+    }
+    for (int i = 0; i <= (2 * n); i++) {
+        ls[i].clear();
+        for (L[i] = i - 1; L[i] != -1 && sm[i] >= sm[L[i]]; L[i] = L[L[i]]);
+        if (L[i] != -1) ls[L[i]].pb(i);
+    }
+    for (int i = 0; i <= (2 * n); i++) reverse(all(ls[i]));
+    iota(arr, arr + n, 0); sort(arr, arr + n, cmp);
+
+    int l = 0, r = n;
+    while (r - l > 1) {
+        int mid = (l + r) / 2;
+        if (check(mid)) r = mid;
+        else l = mid;
+    }
+    cout << r << endl;
+}
+
+int main() {
+    ios::sync_with_stdio(false); cin.tie(0); cout.tie(0);
+
+    int T = 1;
+    cin >> T;
+    while (T--) {
+        solve();
+    }
+
+    return 0;
+}

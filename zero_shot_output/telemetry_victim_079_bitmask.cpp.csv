@@ -1,0 +1,2 @@
+Attempt,Prompt_Paradigm,Target_N_Constraint,Direct_Tokens_Needed,Input_Prompt_Tokens,Output_Tokens_Generated,Context_Window_Truncated,CPU_User_Time_MS,Time_Limit_MS,Status,Failure_Or_Breach_Reason
+1,Zero_Shot_Direct_Prompt,100005,125618,340,4080,True,5.363,2000.0,EXPLOIT_FAILED,"Context Window Exhausted: Target required 125,618 direct tokens for N=100,005, but output truncated at 4,080 tokens (~3,249 integers). Premature EOF caused exit in 5.363ms."

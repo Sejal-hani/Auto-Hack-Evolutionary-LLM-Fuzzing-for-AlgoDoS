@@ -1,0 +1,172 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 100005
+// [INPUT_FORMAT]: T; per case: N, then 2×(N-1) edge pairs (two separate trees T1, T2 each with N-1 edges).
+#include<vector>
+#include<cstdio>
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int maxn=100005;
+struct Edge{
+    int v,nt;
+    Edge(int v=0,int nt=0):
+        v(v),nt(nt){}
+}eG[maxn*160];
+int hdG[maxn*40],numG;
+void qwqG(int u,int v){
+    eG[++numG]=Edge(v,hdG[u]);hdG[u]=numG;
+}
+int tot;
+struct AnTree{
+    struct Edge{
+        int v,nt;
+        Edge(int v=0,int nt=0):
+            v(v),nt(nt){}
+    }e[maxn*2];
+    int hd[maxn],num;
+    void qwq(int u,int v){
+        e[++num]=Edge(v,hd[u]),hd[u]=num;
+    }
+    int n;
+    void init(int n){
+        this->n=n;
+        for(int i=1;i<n;++i){
+            int u,v;
+            scanf("%d%d",&u,&v);
+            qwq(u,v);qwq(v,u);
+        }
+    }
+    int pa[maxn][20],id[maxn][20],dp[maxn];
+    void dfs(int u,int p){
+        if(p==0)dp[u]=0;
+        for(int i=1;(1<<i)<=dp[u];++i)
+            pa[u][i]=pa[pa[u][i-1]][i-1];
+        for(int i=hd[u];i;i=e[i].nt){
+            int v=e[i].v;
+            if(v==p)continue;
+            dp[v]=dp[u]+1;
+            pa[v][0]=u;
+            id[v][0]=++tot;
+            dfs(v,u);
+        }
+    }
+    int getid(int u,int d){
+        int&re=id[u][d];
+        if(re)return re;
+        re=++tot;
+        qwqG(re,getid(u,d-1));
+        qwqG(re,getid(pa[u][d-1],d-1));
+        return re;
+    }
+    void link(int x,int u,int v){
+        if(dp[u]<dp[v])swap(u,v);
+        for(int t=dp[u]-dp[v],cn=0;t;t>>=1,++cn)
+            if(t&1)qwqG(x,getid(u,cn)),u=pa[u][cn];
+        if(u==v)return;
+        int t=0;while(dp[u]>>t)++t;
+        while(t--){
+            if(pa[u][t]!=pa[v][t]){
+                qwqG(x,getid(u,t));
+                qwqG(x,getid(v,t));
+                u=pa[u][t];v=pa[v][t];
+            }
+        }
+        qwqG(x,getid(u,0));
+        qwqG(x,getid(v,0));
+    }
+    void erase(void){
+        for(int i=1;i<=n;++i){
+            hd[i]=0,dp[i]=0;int j=0;
+            while(pa[i][j])pa[i][j++]=0;
+            j=0;while(id[i][j])id[i][j++]=0;
+        }
+        num=0;
+    }
+    int parent(int u){
+        return pa[u][0];
+    }
+    int identity(int u){
+        return id[u][0];
+    }
+}T1,T2;
+int dfn[maxn*40],low[maxn*40],cnt;
+int st[maxn*40],tp,in[maxn*40];
+int scc[maxn*40],scn;
+int vis[maxn*40];
+void tarjan(int u){
+    dfn[u]=low[u]=++cnt;
+    in[st[++tp]=u]=true;
+    for(int i=hdG[u];i;i=eG[i].nt){
+        int v=eG[i].v;
+        if(!dfn[v]){
+            tarjan(v);
+            low[u]=min(low[u],low[v]);
+        }
+        else if(in[v])
+            low[u]=min(low[u],dfn[v]);
+    }
+    if(dfn[u]==low[u]){
+        ++scn;
+        st[tp+1]=0;
+        while(st[tp+1]!=u){
+            in[st[tp]]=false;
+            scc[st[tp]]=scn;
+            --tp;
+        }
+    }
+}
+const int mod=1e9+7;
+int power(int a,int x){
+    int re=1;
+    while(x){
+        if(x&1)re=1ll*re*a%mod;
+        a=1ll*a*a%mod,x>>=1;
+    }
+    return re;
+}
+void solve(void){
+    int n;scanf("%d",&n);
+    T1.init(n);T2.init(n);
+    T1.dfs(1,0);T2.dfs(1,0);
+    int rec=tot;
+    for(int i=2;i<=n;++i){
+        T2.link(T1.identity(i),i,T1.parent(i));
+        T1.link(T2.identity(i),i,T2.parent(i));
+    }
+    for(int i=1;i<=tot;++i)
+        if(!dfn[i])tarjan(i);
+    for(int i=1;i<=rec;++i)
+        ++vis[scc[i]];
+    int ANS=0;
+    for(int i=1;i<=scn;++i){
+        if(vis[i])++ANS;
+        vis[i]=0;
+    }
+    for(int u=1;u<=rec;++u){
+        if(eG[hdG[u]].nt==0){
+            int v=eG[hdG[u]].v;
+            if(u<v&&eG[hdG[v]].nt==0){
+                if(eG[hdG[v]].v==u){
+                    --ANS;
+                }
+            }
+        }
+    }
+    ANS=power(2,ANS);
+    printf("%d\n",ANS);
+    for(int i=1;i<=tot;++i){
+        hdG[i]=0;
+        dfn[i]=low[i]=scc[i]=0;
+    }
+    tot=cnt=scn=numG=0;
+    T1.erase();T2.erase();
+}
+int main(){
+    // freopen("test","r",stdin);
+    // freopen("out","w",stdout);
+    int T;scanf("%d",&T);
+    while(T--)solve();
+    return 0;
+}

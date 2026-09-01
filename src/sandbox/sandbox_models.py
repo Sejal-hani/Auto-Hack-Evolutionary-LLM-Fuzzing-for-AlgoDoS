@@ -15,6 +15,7 @@ class ExecutionStatus(Enum):
     SUCCESS = auto()                 # Exit code 0
     COMPILE_ERROR = auto()           # Failed at g++ phase
     TIME_LIMIT_EXCEEDED = auto()     # SIGKILL via timeout (The AlgoDoS Goal)
+    TIMEOUT = TIME_LIMIT_EXCEEDED    # Alias matching Appendix C.2
     MEMORY_LIMIT_EXCEEDED = auto()   # SIGSEGV or OS OOM Killer
     RUNTIME_ERROR = auto()           # SIGFPE, SIGABRT, unhandled exceptions
     SYSTEM_FAILURE = auto()          # Python Sandbox internal crash
@@ -39,6 +40,7 @@ class TestCase:
     payload: bytes  # Stored as bytes to prevent UTF-8 overhead/corruption
     generation: int
     n_constraint: int
+    time_limit_ms: int = 2000
     
     @property
     def payload_str(self) -> str:
@@ -79,17 +81,17 @@ class ExecutionResult:
     """
     The deterministic output of a Sandbox run.
     """
-    test_case_id: str
     status: ExecutionStatus
-    exit_code: int
     telemetry: HardwareTelemetry
-    stdout: bytes
-    stderr: bytes
+    stdout: bytes = b""
+    stderr: bytes = b""
+    is_algodos_triggered: bool = False
+    test_case_id: str = ""
+    exit_code: int = 0
     
     @property
-    def is_algodos_triggered(self) -> bool:
-        """True if the fuzzer successfully broke the algorithm's time bounds."""
-        return self.status == ExecutionStatus.TIME_LIMIT_EXCEEDED
+    def is_tle(self) -> bool:
+        return self.status in (ExecutionStatus.TIME_LIMIT_EXCEEDED, ExecutionStatus.TIMEOUT)
 
     def get_safe_stderr(self) -> str:
         """

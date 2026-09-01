@@ -1,0 +1,112 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: n/a
+// [INPUT_FORMAT]: T; per case: three scalar integers N, M, K. No array.
+#include <bits/stdc++.h>
+using namespace std;
+#define int int64_t
+
+const int MOD = 1e9 + 7;
+
+int add(int a, int b) {
+    return a + b >= MOD ? a + b - MOD : a + b;
+}
+
+int sub(int a, int b) {
+    return a >= b ? a - b : a + MOD - b;
+}
+
+int mul(int a, int b) {
+    return (1ll * a * b) % MOD;
+}
+
+int pw(int x, int n) {
+    int res = 1;
+    while (n) {
+        if (n % 2 == 0) {
+            x = mul(x, x);
+            n /= 2;
+        } else {
+            res = mul(res, x);
+            --n;
+        }
+    }
+    return res;
+}
+
+const int MAXN = 2e6 + 100;
+int fact[MAXN], invf[MAXN];
+int inv[MAXN];
+int pref[MAXN];
+
+int get_seg(int l, int r) {
+    if (l > r) return 0;
+    return sub(pref[r], pref[l]);
+}
+
+void solve_() {
+    int n, m, k;
+    cin >> n >> m >> k;
+    --k; --n; --m;
+    vector<array<int, 2>> rec;
+    for (int i = 1; i * i <= k; ++i) {
+        int j = k / i;
+        rec.push_back({i, j});
+    }
+    for (int i = (int)rec.size() - 1; i >= 0; --i) {
+        rec.push_back({rec[i][1], rec[i][0]});
+    }
+    int ans = 0;
+
+    auto get = [&](int x, int y) {
+        int res = 0;
+        if (n >= x) {
+            res = add(res, add(1, add(get_seg(x, n), get_seg(x, x + m))));
+        }
+        if (m >= y) {
+            res = add(res, add(1, add(get_seg(y, m), get_seg(y, y + n))));
+        }
+        if (n >= x && m >= y) {
+            res = sub(res, add(1, add(get_seg(x + y, y + n), get_seg(x + y, x + m))));
+        }
+        /// cerr << x << " " << y << ": " << res << endl;
+        return res;
+    };
+
+    for (int i = 0; i < (int)rec.size(); ++i) {
+        ans = add(ans, get(rec[i][0], rec[i][1]));
+        if (i > 0) {
+            ans = sub(ans, get(rec[i - 1][0], rec[i][1]));
+        }
+    }
+    cout << ans << "\n";
+}
+
+#define MULTITEST
+
+main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0); cout.tie(0);
+
+    fact[0] = 1;
+    for (int i = 1; i < MAXN; ++i) {
+        fact[i] = mul(fact[i - 1], i);
+    }
+    invf[MAXN - 1] = pw(fact[MAXN - 1], MOD - 2);
+    for (int i = MAXN - 1; i > 0; --i) {
+        invf[i - 1] = mul(invf[i], i);
+    }
+    for (int i = 1; i < MAXN; ++i) {
+        inv[i] = mul(invf[i], fact[i - 1]);
+        pref[i] = add(pref[i - 1], inv[i]);
+    }
+
+    int tst = 1;
+#ifdef MULTITEST
+    cin >> tst;
+#endif // MULTITEST
+    while (tst--) {
+        solve_();
+    }
+    return 0;
+}

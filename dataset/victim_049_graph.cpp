@@ -1,0 +1,105 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: n/a
+// [INPUT_FORMAT]: T; per case: five scalar integers a, b, c, m, k. No array.
+#include "bits/stdc++.h"
+using namespace std;
+
+#define all(x) x.begin(), x.end()
+template <typename A, typename B> 
+ostream& operator<<(ostream &os, const pair<A, B> &p) { 
+    return os << p.first << " " << p.second; 
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> 
+ostream& operator<<(ostream &os, const T_container &v) { 
+    string sep; 
+    for (const T &x : v) os << sep << x, sep = " "; 
+    return os; 
+}
+#ifdef LOCAL
+#include "debug.h"
+#else
+#define debug(...) 42
+#define ASSERT(...) 42
+#endif
+typedef long long ll;
+typedef vector<int> vi;
+typedef vector<vi> vvi;
+typedef pair<int, int> pi;
+const int oo = 1e9;
+
+vi calc(int a, int k, int m) {
+    vi dp(m, oo);
+    auto dijkstra = [&](int s) { 
+        struct el {
+            int at; ll d;
+            bool operator<(const el& e) const {
+                return d > e.d;
+            }
+        };
+        priority_queue<el> pq;
+        auto push = [&](int at, ll dd) {
+            if (dp[at] > dd) {
+                pq.push({at, dd});
+                dp[at] = dd;
+            }
+        };
+        push(s, 0);
+        while (!pq.empty()) {
+            auto e = pq.top(); pq.pop();
+            if (e.d != dp[e.at]) continue;
+            push((e.at + a) % m, a + e.d);
+            push((e.at * 2) % m, k + e.d);
+        }
+    };
+    dijkstra(a);
+    return dp;
+}
+
+void cmin(int& a, int b) {
+    a = min(a, b);
+}
+
+void solve() {
+    int a, b, c, m, k;
+    cin >> a >> b >> c >> m >> k;
+    array<int, 3> abc = {a, b, c};
+    array<vi, 3> dp = {};
+    for (int i = 0; i < 3; ++i) dp[i] = calc(abc[i], k, m);
+    auto reduce = [&](int at) {
+        if (at >= m) at -= m;
+        return at;
+    };
+    int ans = oo;
+    for (int j = 0; j < 3; ++j) {
+        int val = abc[j];
+        auto mdp = dp[(j + 1) % 3];
+        for (int num = 0; num <= min(m, 40) and num * k <= ans; ++num) {
+            string vis(m, 0);
+            for (int x = 0; x < m; ++x) if (!vis[x]) {
+                int at = x;
+                while (vis[at] < 2) {
+                    vis[at]++;
+                    int to = reduce(at + val);
+                    cmin(mdp[to], mdp[at] + abc[j]);
+                    at = to;
+                }
+            }
+            auto& odp = dp[(j + 2) % 3];
+            for (int x = 0; x < m; ++x) {
+                int mine = reduce(x + val);
+                cmin(ans, odp[reduce(m - mine)] + mdp[x] + num * k);
+            }
+            val = (val * 2) % m;
+        }
+    }
+    cout << ans << '\n';
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int t;
+    cin >> t;
+    while (t--) solve();
+}

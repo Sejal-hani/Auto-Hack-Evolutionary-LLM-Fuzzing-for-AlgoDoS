@@ -1,0 +1,79 @@
+// [TIME_LIMIT_MS]: 1000
+// [MEMORY_LIMIT_MB]: 64
+// [N_CONSTRAINT]: 26 (alphabet-bounded)
+// [INPUT_FORMAT]: T; per case: string S, then integer K (order: string first, then K).
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define pb push_back
+#define mp make_pair
+#define F first
+#define S second
+#define all(x) x.begin(), x.end()
+#define clr(x) memset(x, 0, sizeof(x))
+#define sortall(x) sort(all(x))
+#define tr(it, a) for(auto it = a.begin(); it != a.end(); it++)
+#define PI 3.1415926535897932384626
+typedef pair<int, int>  pii;
+typedef pair<ll, ll>  pl;
+typedef vector<int>   vi;
+typedef vector<ll>    vl;
+typedef vector<pii>   vpii;
+typedef vector<pl>    vpl;
+typedef vector<vi>    vvi;
+typedef vector<vl>    vvl;
+mt19937_64 rang(chrono::high_resolution_clock::now().time_since_epoch().count());
+int rng(int lim) {
+ uniform_int_distribution<int> uid(0,lim-1);
+ return uid(rang);
+}
+
+void solve() {
+    string s;
+    int k;
+    cin >> s >> k;
+    int n = s.size();
+    if (k > n) {
+        cout << "No solution exists\n";
+        return;
+    }
+    vector<int> cnt(26, 0);
+    for (char c : s) {
+        cnt[c - 'a']++;
+    }
+    int rem = n - k;
+    for (int i = 0; i < 26; i++) {
+        if (cnt[i] > 0 && rem > 0) {
+            rem -= cnt[i] - 1;
+            cnt[i] = 1;
+        }
+    }
+    if (rem > 0) {
+        cout << "No solution exists\n";
+        return;
+    }
+    vector<char> ans;
+    for (int i = 0; i < 26; i++) {
+        while (cnt[i] > 0) {
+            ans.push_back('a' + i);
+            cnt[i]--;
+        }
+    }
+    sort(all(ans));
+    for (char c : ans) {
+        cout << c;
+    }
+    cout << "\n";
+}
+
+int main() {
+    ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    srand(chrono::high_resolution_clock::now().time_since_epoch().count());
+    int t = 1;
+    cin >> t;
+    while (t--) {
+        solve();
+    }
+    return 0;
+}

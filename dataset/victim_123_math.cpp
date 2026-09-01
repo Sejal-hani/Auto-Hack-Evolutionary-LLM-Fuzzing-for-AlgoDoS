@@ -1,0 +1,74 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 200005
+// [INPUT_FORMAT]: No T loop (single scanf of N at top of main): N, then array a[1..N].
+#include<bits/stdc++.h>
+using namespace std;
+#define fi first
+#define se second
+#define fill0(a) memset(a,0,sizeof(a))
+#define fill1(a) memset(a,-1,sizeof(a))
+#define fillbig(a) memset(a,63,sizeof(a))
+#define pb push_back
+#define ppb pop_back
+#define mpair make_pair
+#define mt make_tuple
+#define SZ(v) ((int)v.size())
+#ifdef LOCAL
+#define eprintf(...) fprintf(stderr,__VA_ARGS__)
+#else
+#define eprintf(...) 1064
+#endif
+template<typename T1,typename T2>void chkmin(T1 &x,T2 y){if(x>y)x=y;}
+template<typename T1,typename T2>void chkmax(T1 &x,T2 y){if(x<y)x=y;}
+typedef pair<int,int> pii;
+typedef long long ll;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef long double ld;
+#ifdef FASTIO
+#define FILE_SIZE 1<<23
+char rbuf[FILE_SIZE],*p1=rbuf,*p2=rbuf,wbuf[FILE_SIZE],*p3=wbuf;
+#ifdef LOCAL
+inline char getc(){return getchar();}
+inline void putc(char c){putchar(c);}
+#else
+inline char getc(){return p1==p2&&(p2=(p1=rbuf)+fread(rbuf,1,FILE_SIZE,stdin),p1==p2)?-1:*p1++;}
+inline void putc(char x){*p3++=x;}
+#endif
+template<typename T>void read(T &x){
+	x=0;char c=getc();T neg=0;
+	while(!isdigit(c))neg|=(c=='-'),c=getc();
+	while(isdigit(c))x=x*10+(c-'0'),c=getc();
+	if(neg)x=-x;
+}
+template<typename T>void recursive_print(T x){if(!x)return;recursive_print(x/10);putc(x%10^48);}
+template<typename T>void print(T x){if(!x)putc('0');if(x<0)putc('-'),x=-x;recursive_print(x);}
+template<typename T>void print(T x,char c){print(x);putc(c);}
+void readstr(char *s){char c=getc();while(c<=32||c>=127)c=getc();while(c>32&&c<127)s[0]=c,s++,c=getc();(*s)=0;}
+void printstr(string s){for(int i=0;i<s.size();i++)putc(s[i]);}
+void printstr(char *s){int len=strlen(s);for(int i=0;i<len;i++)putc(s[i]);}
+void print_final(){fwrite(wbuf,1,p3-wbuf,stdout);}
+#endif
+int n;
+ll a[200005];
+map<ll,int> mp;
+int main(){
+	scanf("%d",&n);
+	for(int i=1;i<=n;i++)scanf("%lld",a+i);
+	ll sum=0;
+	for(int i=1;i<=n;i++)sum^=a[i];
+	mp[0]=1;
+	ll cur=0;
+	for(int i=1;i<=n;i++){
+		cur^=a[i];
+		if(mp.find(cur)!=mp.end())mp[cur]++;
+		else mp[cur]=1;
+	}
+	ll ans=0;
+	for(auto it:mp){
+		ans+=it.se*(it.se-1)/2;
+	}
+	printf("%lld\n",ans);
+	return 0;
+}

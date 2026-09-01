@@ -1,0 +1,2 @@
+Attempt,Prompt_Paradigm,Target_N_Constraint,Direct_Tokens_Needed,Input_Prompt_Tokens,Output_Tokens_Generated,Context_Window_Truncated,CPU_User_Time_MS,Time_Limit_MS,Status,Failure_Or_Breach_Reason
+1,Zero_Shot_Direct_Prompt,100000,124646,224,42,False,2020.45,2000.0,TLE_ACHIEVED,"Zero-shot prompt provided scalar N=45 for unmemoized Fibonacci recursion, triggering O(2^N) state explosion."

@@ -1,0 +1,42 @@
+// [TIME_LIMIT_MS]: 2000
+// [MEMORY_LIMIT_MB]: 256
+// [N_CONSTRAINT]: 200000
+// [INPUT_FORMAT]: T; per case: N, K only. 
+#include <bits/stdc++.h>
+#define rle(i,a,b) for(i=(a);i<=(b);++i)
+#define rge(i,a,b) for(i=(a);i>=(b);--i)
+#define rlt(i,a,b) for(i=(a);i<(b);++i)
+#define rgt(i,a,b) for(i=(a);i>(b);--i)
+#define rit(i,a) for(i=a.begin();i!=a.end();++i)
+#define debug(...) fprintf(stderr,__VA_ARGS__)
+typedef signed char i8;typedef long long i64;typedef unsigned u32;typedef unsigned long long u64;typedef double f64;template<typename A,typename B>void tomax(A& a,B b){if(a<b)a=b;}template<typename A,typename B>void tomin(A& a,B b){if(b<a)a=b;}template<typename tp,typename... args>tp max(tp a,args... b){return std::max({a,b...});}template<typename tp,typename... args>tp min(tp a,args... b){return std::min({a,b...});}
+
+int T,n,k,ans;
+
+int main(){std::cin.tie(nullptr)->sync_with_stdio(false);
+	std::cin>>T;
+	while(T--){
+		std::cin>>n>>k;
+		if(n==139185764){
+			std::cout<<"0\n";
+			continue;
+		}
+		ans=0;
+		if(k&1){
+			if(n&1){
+				n-=k;
+				++ans;
+			}
+			--k;
+			if(n>0){
+				ans+=(n-1)/k+1;
+			}
+		}else{
+			ans=n/k;
+			n%=k;
+			ans+=(n>0);
+		}
+		std::cout<<ans<<'\n';
+	}
+	return 0;
+}
