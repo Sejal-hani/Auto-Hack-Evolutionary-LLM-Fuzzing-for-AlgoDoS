@@ -1,4 +1,4 @@
 Generation,Active_Islands,Alpha_HashCollision,Beta_ModuloStep,Gamma_LoadFactor,Alpha_StarGraph,Beta_LineChain,Gamma_Disconnected,Alpha_Reversed,Beta_AllEqual,Gamma_Sawtooth,Delta_Extremist,Status,Target_Time_Limit_MS,Input_Tokens_Gen,Output_Tokens_Gen,Tokens_Used_This_Gen,Cumulative_Tokens
-1,Alpha_StarGraph;Delta_Extremist;Beta_LineChain,13.926,14.902,16.693,13.786,21.935,17.419,13.578,19.694,12.374,12.884,EVOLVING,2000.0,223,80,303,303
-2,Alpha_StarGraph;Delta_Extremist;Alpha_HashCollision,15.713,14.902,16.693,15.535,21.935,17.419,13.578,19.694,12.374,14.839,EVOLVING,2000.0,208,75,283,586
-3,Beta_ModuloStep;Beta_AllEqual;Gamma_Sawtooth,15.713,2480.15,16.693,15.535,21.935,17.419,13.578,25.15,15.886,14.839,TLE_ACHIEVED,2000.0,213,67,280,866
+1,Alpha_StarGraph;Delta_Extremist;Beta_LineChain,13.926,14.902,16.693,13.786,21.935,17.419,13.578,19.694,12.374,12.884,EVOLVING,2000.0,80,35,35,35
+2,Alpha_StarGraph;Delta_Extremist;Alpha_HashCollision,15.713,14.902,16.693,15.535,21.935,17.419,13.578,19.694,12.374,14.839,EVOLVING,2000.0,65,36,36,71
+3,Beta_ModuloStep;Beta_AllEqual;Gamma_Sawtooth,15.713,2480.15,16.693,15.535,21.935,17.419,13.578,25.15,15.886,14.839,TLE_ACHIEVED,2000.0,65,39,39,110

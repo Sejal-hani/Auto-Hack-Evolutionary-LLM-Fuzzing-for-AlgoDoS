@@ -1,2 +1,2 @@
 Generation,Active_Islands,Alpha_HashCollision,Beta_ModuloStep,Gamma_LoadFactor,Alpha_StarGraph,Beta_LineChain,Gamma_Disconnected,Alpha_Reversed,Beta_AllEqual,Gamma_Sawtooth,Delta_Extremist,Status,Target_Time_Limit_MS,Input_Tokens_Gen,Output_Tokens_Gen,Tokens_Used_This_Gen,Cumulative_Tokens
-1,Beta_ModuloStep;Alpha_HashCollision;Gamma_Sawtooth,20.553,1121.87,22.032,9.129,9.471,17.256,13.906,20.493,23.16,12.902,TLE_ACHIEVED,1000.0,219,78,297,297
+1,Beta_ModuloStep;Alpha_HashCollision;Gamma_Sawtooth,20.553,1121.87,22.032,9.129,9.471,17.256,13.906,20.493,23.16,12.902,TLE_ACHIEVED,1000.0,70,40,40,40

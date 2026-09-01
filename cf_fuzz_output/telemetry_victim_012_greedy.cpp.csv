@@ -1,7 +1,7 @@
 Generation,Active_Islands,Alpha_HashCollision,Beta_ModuloStep,Gamma_LoadFactor,Alpha_StarGraph,Beta_LineChain,Gamma_Disconnected,Alpha_Reversed,Beta_AllEqual,Gamma_Sawtooth,Delta_Extremist,Status,Target_Time_Limit_MS,Input_Tokens_Gen,Output_Tokens_Gen,Tokens_Used_This_Gen,Cumulative_Tokens
-1,Gamma_Sawtooth;Delta_Extremist;Beta_AllEqual,16.516,22.901,8.832,23.669,11.412,23.109,24.769,12.847,17.172,24.427,EVOLVING,100.0,220,71,291,291
-2,Alpha_Reversed;Gamma_LoadFactor;Alpha_HashCollision,19.405,22.901,10.28,23.669,11.412,23.109,27.823,12.847,17.172,24.427,EVOLVING,100.0,207,75,282,573
-3,Beta_AllEqual;Alpha_Reversed;Beta_ModuloStep,19.405,24.396,10.28,23.669,11.412,23.109,31.473,14.531,17.172,24.427,EVOLVING,100.0,214,72,286,859
-4,Beta_AllEqual;Alpha_HashCollision;Beta_ModuloStep,22.51,26.809,10.28,23.669,11.412,23.109,31.473,17.61,17.172,24.427,EVOLVING,100.0,216,76,292,1151
-5,Beta_ModuloStep;Alpha_Reversed;Alpha_StarGraph,22.51,34.467,10.28,30.635,11.412,23.109,37.284,17.61,17.172,24.427,EVOLVING,100.0,218,75,293,1444
-6,Alpha_StarGraph;Beta_LineChain;Alpha_Reversed,22.51,34.467,10.28,619.56,13.859,23.109,45.0,17.61,17.172,24.427,TLE_ACHIEVED,100.0,216,77,293,1737
+1,Gamma_Sawtooth;Delta_Extremist;Beta_AllEqual,16.516,22.901,8.832,23.669,11.412,23.109,24.769,12.847,17.172,24.427,EVOLVING,100.0,73,33,33,33
+2,Alpha_Reversed;Gamma_LoadFactor;Alpha_HashCollision,19.405,22.901,10.28,23.669,11.412,23.109,27.823,12.847,17.172,24.427,EVOLVING,100.0,75,33,33,66
+3,Beta_AllEqual;Alpha_Reversed;Beta_ModuloStep,19.405,24.396,10.28,23.669,11.412,23.109,31.473,14.531,17.172,24.427,EVOLVING,100.0,80,32,32,98
+4,Beta_AllEqual;Alpha_HashCollision;Beta_ModuloStep,22.51,26.809,10.28,23.669,11.412,23.109,31.473,17.61,17.172,24.427,EVOLVING,100.0,72,39,39,137
+5,Beta_ModuloStep;Alpha_Reversed;Alpha_StarGraph,22.51,34.467,10.28,30.635,11.412,23.109,37.284,17.61,17.172,24.427,EVOLVING,100.0,66,36,36,173
+6,Alpha_StarGraph;Beta_LineChain;Alpha_Reversed,22.51,34.467,10.28,619.56,13.859,23.109,45.0,17.61,17.172,24.427,TLE_ACHIEVED,100.0,80,33,33,206
